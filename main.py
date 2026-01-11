@@ -3,7 +3,7 @@ from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH)
 
 pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 ################################################
 # Func for determining which tile is L_clicked #
@@ -44,7 +44,7 @@ def main():
     while running:
 
         clock.tick(FPS)
-        screen.fill((255,255,255))
+        SCREEN.fill((255,255,255))
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
