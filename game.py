@@ -18,32 +18,13 @@ clock = pygame.time.Clock()
 HALF_HEIGHT = 12 * scale_factor  # offset dim (half of diamond)
 HALF_WIDTH =  25 * scale_factor  # offset dim (half of width)
 DIMENSION = 7
-INITIAL_OFFSET = 400
 
 INITIAL_OFFSET_X = screen.get_width() / 2 - HALF_WIDTH
 INITIAL_OFFSET_Y = (screen.get_height() / 2) - (HALF_HEIGHT * 2 * DIMENSION / 2)
 FPS = 60
 block_list = []
 #row_length = 1
-'''
-flag = 1
-for i in range(ROWS):
-    block_list.append([])
-    for j in range(row_length):
-        block_list[i].append(j)
-    if row_length >= DIMENSION:
-        flag = -1
-    row_length += flag
 
-line = 0
-for group in block_list:
-    size = len(group)
-    print(f"size:{size}")
-    print(f"index {line}")
-    for tile in range(size):
-        print(f"tile {tile}")
-    line += 1
-'''
 
 class Tile:
     def __init__(self, status, img, x, y):
