@@ -1,9 +1,14 @@
 import pygame
-from constants import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH)
+from constants import INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH #load_assets
+from game import Game
+
+###############################
+# Init screen and load assets #
+###############################
 
 pygame.init()
-SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+SCREEN = pygame.display.set_mode((1800, 900))
+#load_assets()
 
 ################################################
 # Func for determining which tile is L_clicked #
@@ -31,9 +36,9 @@ def calc_tile_coord(position):
     print(f"x,y: {row, col}")
 
 
-#######################################################
-# Main loop for continuously checking for new  inputs #
-#######################################################
+######################################################
+# Main loop for continuously checking for new inputs #
+######################################################
 
 clock = pygame.time.Clock()
 FPS = 60
@@ -41,10 +46,12 @@ FPS = 60
 def main():
 
     running = True
+    SCREEN.fill((255, 255, 255))
+    game = Game(SCREEN)  # initialize game
+
     while running:
 
         clock.tick(FPS)
-        SCREEN.fill((255,255,255))
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -60,7 +67,9 @@ def main():
 
             pygame.display.flip()
 
+        SCREEN.fill((255,255,255))
+        game.update()
 
-        pygame.quit()
+    pygame.quit()
 
 main()
