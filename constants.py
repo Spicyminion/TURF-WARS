@@ -15,7 +15,7 @@ class TileType(Enum):
 # DIMENSIONS FOR BOARD AND SCREEN
 SCREEN_WIDTH, SCREEN_HEIGHT = 1800, 900
 
-SCALE_FACTOR = 4.0
+SCALE_FACTOR = 4.0  # usual final tile size will 196w x 100h
 HALF_HEIGHT = 12 * SCALE_FACTOR  # offset dim (half of diamond)
 HALF_WIDTH =  25 * SCALE_FACTOR  # offset dim (half of width)
 DIMENSION = 7
@@ -26,11 +26,14 @@ INITIAL_OFFSET_Y = (SCREEN_HEIGHT / 2) - (HALF_HEIGHT * 2 * DIMENSION / 2)  # fi
 # PNG ASSETS
 BLOCK = pygame.image.load('grass_block.png')
 CLICKED_BLOCK = pygame.image.load('clicked_grass_block.png')
+APARTMENT = pygame.image.load('apartment_test.png')
+
 COLOR_KEY = (0,0,0)
 w, h = BLOCK.get_size()
 
 BLOCK.set_colorkey(COLOR_KEY)
 CLICKED_BLOCK.set_colorkey(COLOR_KEY)
+APARTMENT.set_colorkey(COLOR_KEY)
 
 BLOCK = pygame.transform.scale(BLOCK, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))
 CLICKED_BLOCK = pygame.transform.scale(CLICKED_BLOCK, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))

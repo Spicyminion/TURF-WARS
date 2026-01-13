@@ -1,5 +1,5 @@
 import pygame
-from constants import SCALE_FACTOR, HALF_HEIGHT, HALF_WIDTH, BLOCK, CLICKED_BLOCK, TileType, INITIAL_OFFSET_Y, INITIAL_OFFSET_X
+from constants import SCALE_FACTOR, HALF_HEIGHT, HALF_WIDTH, BLOCK, CLICKED_BLOCK, TileType, INITIAL_OFFSET_Y, INITIAL_OFFSET_X, APARTMENT
 #import constants
 
 class Tile:
@@ -13,6 +13,8 @@ class Tile:
     def draw(self, window):
         if self.type == TileType.BLANK:
             window.blit(BLOCK, (self.x, self.y))
+        #elif self.type == TileType.SPAWN_CIRCLE:
+        #    window.blit(APARTMENT, (self.x, self.y))
         else:
             window.blit(CLICKED_BLOCK, (self.x, self.y))
 
