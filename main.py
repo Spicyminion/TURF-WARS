@@ -1,5 +1,5 @@
 import pygame
-from constants import INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH #load_assets
+from constants import INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH, DIMENSION #load_assets
 from game import Game
 
 ###############################
@@ -32,8 +32,7 @@ def calc_tile_coord(position):
     row = int(gx)
     col = int(gy)
 
-    print(f"norm_x,norm_y: {nx, ny}")
-    print(f"x,y: {row, col}")
+    return row, col
 
 
 ######################################################
@@ -60,7 +59,10 @@ def main():
 
                 if event.button == 1:
                     location = pygame.mouse.get_pos()
-                    calc_tile_coord(location)
+                    d1, d2 = calc_tile_coord(location)
+                    if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
+                        print(f"x,y: {d1, d2}")
+                        game.get_space(d1, d2, location[0], location[1])
 
             elif event.type == pygame.QUIT:
                 running = False
