@@ -1,6 +1,9 @@
 import pygame
 from enum import Enum
 
+from testing import clicked_block
+
+
 # TILE TYPES
 
 class TileType(Enum):
@@ -11,8 +14,10 @@ class TileType(Enum):
     HOUSE = 4
     MALL = 5
 
+###################################
+# DIMENSIONS FOR BOARD AND SCREEN #
+###################################
 
-# DIMENSIONS FOR BOARD AND SCREEN
 SCREEN_WIDTH, SCREEN_HEIGHT = 1800, 900
 
 SCALE_FACTOR = 4.0  # usual final tile size will 196w x 100h
@@ -23,12 +28,21 @@ DIMENSION = 7
 INITIAL_OFFSET_X = SCREEN_WIDTH / 2 - HALF_WIDTH
 INITIAL_OFFSET_Y = (SCREEN_HEIGHT / 2) - (HALF_HEIGHT * 2 * DIMENSION / 2)  # first div brings to mid, 2nd moves up height of half of board
 
-# PNG ASSETS
+##############
+# PNG ASSETS #
+##############
+
+COLOR_KEY = (0,0,0)
+def load_image(img, scale_factor):
+    load = pygame.image.load(img)
+    w, h = load.get_size()
+    load = pygame.transform.scale(load, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))
+    return load
+
 BLOCK = pygame.image.load('grass_block.png')
 CLICKED_BLOCK = pygame.image.load('clicked_grass_block.png')
 APARTMENT = pygame.image.load('apartment_test.png')
 
-COLOR_KEY = (0,0,0)
 w, h = BLOCK.get_size()
 
 BLOCK.set_colorkey(COLOR_KEY)
@@ -37,6 +51,10 @@ APARTMENT.set_colorkey(COLOR_KEY)
 
 BLOCK = pygame.transform.scale(BLOCK, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))
 CLICKED_BLOCK = pygame.transform.scale(CLICKED_BLOCK, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))
+APARTMENT = pygame.transform.scale(APARTMENT, (int(w * 2), int(h * 2)))
+
+BLOCK_MASK = pygame.mask.from_surface(BLOCK)
+CLICKED_BLOCK_MASK = pygame.mask.from_surface(CLICKED_BLOCK)
 
 '''
 def load_assets():
