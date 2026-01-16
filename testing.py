@@ -1,3 +1,4 @@
+'''
 import pygame
 import math
 
@@ -76,3 +77,4 @@ while running:
         clock.tick(FPS)
 
 pygame.quit()
+'''

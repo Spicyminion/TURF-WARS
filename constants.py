@@ -1,9 +1,6 @@
 import pygame
 from enum import Enum
 
-from testing import clicked_block
-
-
 # TILE TYPES
 
 class TileType(Enum):
@@ -18,9 +15,11 @@ class TileType(Enum):
 # DIMENSIONS FOR BOARD AND SCREEN #
 ###################################
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 1800, 900
+ORIG_WIDTH, ORIG_HEIGHT = 1800, 900 # tested on desktop monitor
+SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 700  # 1800, 900
 
-SCALE_FACTOR = 4.0  # usual final tile size will 196w x 100h
+adjust = SCREEN_WIDTH / ORIG_WIDTH
+SCALE_FACTOR = 4.0 * adjust # usual final tile size will 196w x 100h (4.0)
 HALF_HEIGHT = 12 * SCALE_FACTOR  # offset dim (half of diamond)
 HALF_WIDTH =  25 * SCALE_FACTOR  # offset dim (half of width)
 DIMENSION = 7
@@ -41,7 +40,7 @@ def load_image(img, scale_factor):
 
 BLOCK = pygame.image.load('grass_block.png')
 CLICKED_BLOCK = pygame.image.load('clicked_grass_block.png')
-APARTMENT = pygame.image.load('apartment_test.png')
+APARTMENT = pygame.image.load('pixil-layer-Layer_5.png')
 
 w, h = BLOCK.get_size()
 
