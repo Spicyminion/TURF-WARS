@@ -15,13 +15,14 @@ class TileType(Enum):
 # DIMENSIONS FOR BOARD AND SCREEN #
 ###################################
 
-ORIG_WIDTH, ORIG_HEIGHT = 1800, 900 # tested on desktop monitor
-SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 700  # 1800, 900
+INTERNAL_WIDTH, INTERNAL_HEIGHT = 1800, 900 # tested on desktop monitor
+SCREEN_WIDTH, SCREEN_HEIGHT = INTERNAL_WIDTH, INTERNAL_HEIGHT  # 1800, 900
 
-adjust = SCREEN_WIDTH / ORIG_WIDTH
-SCALE_FACTOR = 4.0 * adjust # usual final tile size will 196w x 100h (4.0)
-HALF_HEIGHT = 12 * SCALE_FACTOR  # offset dim (half of diamond)
-HALF_WIDTH =  25 * SCALE_FACTOR  # offset dim (half of width)
+SCALE_FACTOR = 1
+
+BLOCK_SCALE_FACTOR = 4.0  # usual final tile size will 196w x 100h (4.0)
+HALF_HEIGHT = 12 * BLOCK_SCALE_FACTOR  # offset dim (half of diamond)
+HALF_WIDTH =  25 * BLOCK_SCALE_FACTOR  # offset dim (half of width)
 DIMENSION = 7
 
 INITIAL_OFFSET_X = SCREEN_WIDTH / 2 - HALF_WIDTH
@@ -48,8 +49,8 @@ BLOCK.set_colorkey(COLOR_KEY)
 CLICKED_BLOCK.set_colorkey(COLOR_KEY)
 APARTMENT.set_colorkey(COLOR_KEY)
 
-BLOCK = pygame.transform.scale(BLOCK, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))
-CLICKED_BLOCK = pygame.transform.scale(CLICKED_BLOCK, (int(w * SCALE_FACTOR), int(h * SCALE_FACTOR)))
+BLOCK = pygame.transform.scale(BLOCK, (int(w * BLOCK_SCALE_FACTOR), int(h * BLOCK_SCALE_FACTOR)))
+CLICKED_BLOCK = pygame.transform.scale(CLICKED_BLOCK, (int(w * BLOCK_SCALE_FACTOR), int(h * BLOCK_SCALE_FACTOR)))
 APARTMENT = pygame.transform.scale(APARTMENT, (int(w * 2), int(h * 2)))
 
 BLOCK_MASK = pygame.mask.from_surface(BLOCK)

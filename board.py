@@ -3,7 +3,6 @@ from layout import layout
 from tile import Tile
 from constants import HALF_HEIGHT, HALF_WIDTH, INITIAL_OFFSET_Y, INITIAL_OFFSET_X, BLOCK, CLICKED_BLOCK
 
-
 class Board:
 
     def __init__(self, window):

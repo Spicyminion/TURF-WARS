@@ -1,4 +1,6 @@
 import pygame
+
+import constants
 from constants import INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH, DIMENSION, SCREEN_HEIGHT, SCREEN_WIDTH
 from game import Game
 
@@ -10,8 +12,8 @@ pygame.init()
 
 # Check resolution of local computer
 res = pygame.display.Info()
-
-SCREEN = pygame.display.set_mode((res.current_w, res.current_h-50))
+SCALE_FACTOR = None
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 ################################################
 # Func for determining which tile is L_clicked #
@@ -50,7 +52,6 @@ def main():
     running = True
     SCREEN.fill((255, 255, 255))
     game = Game(SCREEN)  # initialize game
-
     while running:
 
         clock.tick(FPS)
