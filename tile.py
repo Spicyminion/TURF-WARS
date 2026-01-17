@@ -23,7 +23,7 @@ class Clickable:
 
 
 class Tile(Clickable):
-    def __init__(self, type, x, y, col, row, config):
+    def __init__(self, type, x, y, col, row, config, id):
 
         if type == TileType.BLANK:
             use_image = config.assets.get('grass_block')
@@ -35,24 +35,31 @@ class Tile(Clickable):
         self.col = col
         self.type = type
         self.config = config
+        self.id = id
         self.characters = []
         self.building = []
 
     def check_pos(self):
         print(self.rect.x)
 
-    '''
-    def draw(self, window):
-        window.blit(self.image, self.rect.topleft) # print where top left of rectangle is
-        #pygame.draw.rect(window, (255, 0, 0), (self.rect.x, self.rect.y, self.rect.width, self.rect.height), 2 )
-        for structure in self.building:
-            structure.draw(window)
-    '''
-
     def draw(self, window):
         super().draw(window)
         for structure in self.building:
             structure.draw(window)
+
+    def check_click(self, click_x, click_y):
+        if super().check_click(click_x, click_y):
+            check = True
+            for character in self.characters:
+                if character.check_click(click_x, click_y):
+                    check = False
+                    break
+            if check:
+                for building in self.building:
+                    if building.check_click(click_x, click_y):
+                        print("building clicked!")
+                        break
+
 
 class Building(Clickable):
     def __init__(self, x, y, col, row, config):

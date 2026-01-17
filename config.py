@@ -8,9 +8,26 @@ class LoadImg:
         self.imgs = {}
         self.path = os.getcwd()
         self.load_imgs()
-
+    '''
     def load_imgs(self):
         for file in os.listdir(self.path):
+            if file.lower().endswith(".png") and "block" in file:
+                name = os.path.splitext(file)[0] # remove file type
+                img = pygame.image.load(file)
+                w, h = img.get_size()
+                img = pygame.transform.scale(img, (int(w * self.scale_factor * BLOCK_SCALE), int(h * self.scale_factor * BLOCK_SCALE)))
+                self.imgs[name] = img
+            elif file.lower().endswith(".png"):
+                name = os.path.splitext(file)[0]
+                img = pygame.image.load(file)
+                w, h = img.get_size()
+                img = pygame.transform.scale(img, (int(w * self.scale_factor), int(h * self.scale_factor)))
+                self.imgs[name] = img
+    '''
+
+    def load_imgs(self):
+        asset_folders = ['tile_imgs',
+        for dir in os.listdir(self.path):
             if file.lower().endswith(".png") and "block" in file:
                 name = os.path.splitext(file)[0] # remove file type
                 img = pygame.image.load(file)

@@ -25,10 +25,9 @@ SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
 def check_button(position):
     x, y = position
 
-def calc_tile_coord(position):
+def calc_tile_coord(x, y):
 
     # First we need to center the coordinates with respect to top of board
-    x, y = position
     cx, cy = x - config.INITIAL_OFFSET_X - config.HALF_WIDTH, y - config.INITIAL_OFFSET_Y
 
     # Now normalize x & y coords to width and height of each tile respectively (units for moving)
@@ -67,12 +66,12 @@ def main():
                 # event == 1 is L_click, == 2 is middle_button, == 3, is R_click
 
                 if event.button == 1:
-                    location = pygame.mouse.get_pos()
-                    game.get_button(location[0], location[1])
-                    d1, d2 = calc_tile_coord(location)
+                    x, y = pygame.mouse.get_pos()
+                    game.get_button(x, y)
+                    d1, d2 = calc_tile_coord(x, y)
                     if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
                         print(f"x,y: {d1, d2}")
-                        game.get_space(d1, d2, location[0], location[1])
+                        game.get_space(d1, d2, x, y)
 
             elif event.type == pygame.QUIT:
                 running = False
