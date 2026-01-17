@@ -29,17 +29,17 @@ class LoadImg:
 
 class ConfigGame:
     def __init__(self, screen_width, screen_height):
-        self.screen_width = int(screen_width * 0.8)
-        self.screen_height = int(screen_height * 0.8)
+        self.screen_width = int(screen_width * 0.9)
+        self.screen_height = int(screen_height * 0.9)
 
         self.scale = min(
             self.screen_width / 1800,  # 1800, 900 are internal resolution
             self.screen_height / 900
         )
 
-        self.HALF_WIDTH = int(self.scale * 25 * 4)
-        self.HALF_HEIGHT = int(self.scale * 12 * 4)
-        self.INITIAL_OFFSET_X = int((self.screen_width / 2) - self.HALF_WIDTH)
-        self.INITIAL_OFFSET_Y = int((self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2)) # first div brings to mid, 2nd moves up height of half of board
+        self.HALF_WIDTH = self.scale * 25 * BLOCK_SCALE
+        self.HALF_HEIGHT = self.scale * 12 * BLOCK_SCALE
+        self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH
+        self.INITIAL_OFFSET_Y = (self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2) # first div brings to mid, 2nd moves up height of half of board
 
         self.assets = LoadImg(self.scale)
