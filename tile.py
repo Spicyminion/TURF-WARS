@@ -34,16 +34,49 @@ class Tile(Clickable):
         self.row = row
         self.col = col
         self.type = type
-        self.characters = []
         self.config = config
+        self.characters = []
+        self.building = []
+
+    def check_pos(self):
+        print(self.rect.x)
+
+    '''
+    def draw(self, window):
+        window.blit(self.image, self.rect.topleft) # print where top left of rectangle is
+        #pygame.draw.rect(window, (255, 0, 0), (self.rect.x, self.rect.y, self.rect.width, self.rect.height), 2 )
+        for structure in self.building:
+            structure.draw(window)
+    '''
+
+    def draw(self, window):
+        super().draw(window)
+        for structure in self.building:
+            structure.draw(window)
+
+class Building(Clickable):
+    def __init__(self, x, y, col, row, config):
+
+        img = config.assets.get('apartment')
+        w, h = img.get_size()
+        x = x - w / 2
+        y = y - h / 2
+        super().__init__(x, y, img)
+        self.config = config
+        self.row = row
+        self.col = col
 
     def check_pos(self):
         print(self.rect.x)
 
 
-'''
-class Building(Clickable):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-'''
+class Button(Clickable):
+    def __init__(self, x, y, image, config):
+
+        use_image = config.assets.get(image)
+        super().__init__(x, y, use_image)
+        self.config = config
+
+    def check_click(self, click_x, click_y):
+        if super().check_click(click_x, click_y):
+            print("button clicked!")

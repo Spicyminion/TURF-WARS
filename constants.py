@@ -9,7 +9,7 @@ from enum import Enum
 #SCREEN_WIDTH, SCREEN_HEIGHT = INTERNAL_WIDTH, INTERNAL_HEIGHT  # 1800, 900
 
 SCALE_FACTOR = 1
-BLOCK_SCALE = 4.0   # usual final tile size will 196w x 100h (4.0)
+BLOCK_SCALE = 5.0   # usual final tile size will 196w x 100h (4.0)
 HALF_HEIGHT = 12 * BLOCK_SCALE  # offset dim (half of diamond)
 HALF_WIDTH =  25 * BLOCK_SCALE  # offset dim (half of width)
 DIMENSION = 7

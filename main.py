@@ -1,6 +1,7 @@
 import pygame
 from constants import HALF_HEIGHT, HALF_WIDTH, DIMENSION
 from game import Game
+from board import UI
 from config import ConfigGame
 
 ###############################
@@ -18,8 +19,11 @@ SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
 
 
 ################################################
-# Func for determining which tile is L_clicked #
+# Funcs for determining which button or tile is L_clicked #
 ################################################
+
+def check_button(position):
+    x, y = position
 
 def calc_tile_coord(position):
 
@@ -64,6 +68,7 @@ def main():
 
                 if event.button == 1:
                     location = pygame.mouse.get_pos()
+                    game.get_button(location[0], location[1])
                     d1, d2 = calc_tile_coord(location)
                     if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
                         print(f"x,y: {d1, d2}")
