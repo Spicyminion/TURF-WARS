@@ -1,12 +1,13 @@
 import pygame
 from layout import layout
 from tile import Tile
-from constants import HALF_HEIGHT, HALF_WIDTH, INITIAL_OFFSET_Y, INITIAL_OFFSET_X, BLOCK, CLICKED_BLOCK
+#from constants import
 
 class Board:
 
-    def __init__(self, window):
+    def __init__(self, window, config):
         self.window = window
+        self.config = config
         self.tiles = []
         self.define_grid()
 
@@ -15,9 +16,9 @@ class Board:
             self.tiles.append([])
             for row in range(len(layout[column])):
                 tile_type = layout[column][row]
-                x = INITIAL_OFFSET_X + (HALF_WIDTH * column) - HALF_WIDTH * row
-                y = INITIAL_OFFSET_Y + (HALF_HEIGHT * column) + HALF_HEIGHT * row
-                self.tiles[column].append(Tile(tile_type, x, y, column, row))
+                x = self.config.INITIAL_OFFSET_X + (self.config.HALF_WIDTH * column) - self.config.HALF_WIDTH * row
+                y = self.config.INITIAL_OFFSET_Y + (self.config.HALF_HEIGHT * column) + self.config.HALF_HEIGHT * row
+                self.tiles[column].append(Tile(tile_type, x, y, column, row, self.config))
 
     def draw_board(self, window):
         for column_tiles in self.tiles:

@@ -1,8 +1,7 @@
 import pygame
-
-import constants
-from constants import INITIAL_OFFSET_X, INITIAL_OFFSET_Y, HALF_HEIGHT, HALF_WIDTH, DIMENSION, SCREEN_HEIGHT, SCREEN_WIDTH
+from constants import HALF_HEIGHT, HALF_WIDTH, DIMENSION
 from game import Game
+from config import ConfigGame
 
 ###############################
 # Init screen and load assets #
@@ -12,8 +11,11 @@ pygame.init()
 
 # Check resolution of local computer
 res = pygame.display.Info()
-SCALE_FACTOR = None
-SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+config = ConfigGame(res.current_w, res.current_h)
+SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
+
+# Update image sizes
+
 
 ################################################
 # Func for determining which tile is L_clicked #
@@ -23,11 +25,11 @@ def calc_tile_coord(position):
 
     # First we need to center the coordinates with respect to top of board
     x, y = position
-    cx, cy = x - INITIAL_OFFSET_X - HALF_WIDTH, y - INITIAL_OFFSET_Y
+    cx, cy = x - config.INITIAL_OFFSET_X - config.HALF_WIDTH, y - config.INITIAL_OFFSET_Y
 
     # Now normalize x & y coords to width and height of each tile respectively (units for moving)
-    nx = cx / HALF_WIDTH
-    ny = cy / HALF_HEIGHT
+    nx = cx / config.HALF_WIDTH
+    ny = cy / config.HALF_HEIGHT
 
     # Next convert into x, y within range of (7,7) 7x7 tiles
     gx = (nx + ny) / 2
@@ -38,7 +40,6 @@ def calc_tile_coord(position):
     col = int(gy)
 
     return row, col
-
 
 ######################################################
 # Main loop for continuously checking for new inputs #
@@ -51,7 +52,7 @@ def main():
 
     running = True
     SCREEN.fill((255, 255, 255))
-    game = Game(SCREEN)  # initialize game
+    game = Game(SCREEN, config)  # initialize game
     while running:
 
         clock.tick(FPS)

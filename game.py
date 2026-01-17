@@ -2,12 +2,13 @@ import pygame
 from board import Board
 class Game:
 
-    def __init__(self, window):
+    def __init__(self, window, config):
         self.window = window
+        self.config = config
         self._init()
 
     def _init(self):
-        self.board = Board(self.window)
+        self.board = Board(self.window, self.config)
         self.board.draw_board(self.window)
 
     def update(self):

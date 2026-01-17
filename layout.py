@@ -1,8 +1,15 @@
-import pygame
-from constants import TileType
+from enum import Enum
 # 7x7 grid
 # 1D is x-axis, 2D is y-axis (they are printed diagonally downwards from R to L) * imagine array rotated 45 deg. left
 # 0 = blank space, 1 = base, 2 = spawn_circle, 3 = lock_space, 4 = house, 5 = mall
+
+class TileType(Enum):
+    BLANK = 0
+    BASE = 1
+    SPAWN_CIRCLE = 2
+    LOCK_SPACE = 3
+    HOUSE = 4
+    MALL = 5
 
 layout = [
     [TileType.BASE,         TileType.SPAWN_CIRCLE,  TileType.BLANK,     TileType.LOCK_SPACE,    TileType.BLANK, TileType.SPAWN_CIRCLE,  TileType.BASE,],
