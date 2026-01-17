@@ -26,20 +26,18 @@ class LoadImg:
     '''
 
     def load_imgs(self):
-        asset_folders = ['tile_imgs',
-        for dir in os.listdir(self.path):
-            if file.lower().endswith(".png") and "block" in file:
-                name = os.path.splitext(file)[0] # remove file type
-                img = pygame.image.load(file)
-                w, h = img.get_size()
-                img = pygame.transform.scale(img, (int(w * self.scale_factor * BLOCK_SCALE), int(h * self.scale_factor * BLOCK_SCALE)))
-                self.imgs[name] = img
-            elif file.lower().endswith(".png"):
-                name = os.path.splitext(file)[0]
-                img = pygame.image.load(file)
-                w, h = img.get_size()
-                img = pygame.transform.scale(img, (int(w * self.scale_factor), int(h * self.scale_factor)))
-                self.imgs[name] = img
+        for directory in os.listdir(self.path):
+            dir_path = os.path.join(self.path, directory)
+            if dir_path and dir_path.endswith("_imgs"):
+                for png in os.listdir(dir_path):
+                    name = os.path.splitext(png)[0] # remove file type
+                    img = pygame.image.load(os.path.join(dir_path, png))
+                    w, h = img.get_size()
+                    if png.lower().endswith(".png") and "block" in png:
+                        img = pygame.transform.scale(img, (int(w * self.scale_factor * BLOCK_SCALE), int(h * self.scale_factor * BLOCK_SCALE)))
+                    else:
+                        img = pygame.transform.scale(img, (int(w * self.scale_factor), int(h * self.scale_factor)))
+                    self.imgs[name] = img
 
     def get(self, name):
         return self.imgs[name]

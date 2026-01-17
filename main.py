@@ -22,8 +22,6 @@ SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
 # Funcs for determining which button or tile is L_clicked #
 ################################################
 
-def check_button(position):
-    x, y = position
 
 def calc_tile_coord(x, y):
 
@@ -62,19 +60,26 @@ def main():
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-
                 # event == 1 is L_click, == 2 is middle_button, == 3, is R_click
-
                 if event.button == 1:
                     x, y = pygame.mouse.get_pos()
-                    game.get_button(x, y)
-                    d1, d2 = calc_tile_coord(x, y)
-                    if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
-                        print(f"x,y: {d1, d2}")
-                        game.get_space(d1, d2, x, y)
+                    if game.get_button(x, y):
+                        None
+                    else:
+                        d1, d2 = calc_tile_coord(x, y)
+                        if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
+                            print(f"x,y: {d1, d2}")
+                            game.get_space(d1, d2, x, y)
 
             elif event.type == pygame.QUIT:
                 running = False
+
+            else:
+                x, y = pygame.mouse.get_pos()
+                d1, d2 = calc_tile_coord(x, y)
+                if 0 <= d1 <= (DIMENSION - 1) and 0 <= d2 <= (DIMENSION - 1):
+                    game.check_all(d1, d2, x, y)
+
 
             pygame.display.flip()
 

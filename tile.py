@@ -14,7 +14,7 @@ class Clickable:
         if not self.rect.collidepoint(click_x, click_y): # check if clicked inside where the rect is (in realspace)
             return False
         check_x, check_y = (click_x - self.rect.x, click_y - self.rect.y)  # recenter around top_L 0,0
-        print(check_x, check_y)
+        #print(check_x, check_y)
         return self.mask.get_at((check_x, check_y))  # check if the click is within the boundaries of the image
 
     def draw(self, window):
@@ -50,6 +50,7 @@ class Tile(Clickable):
     def check_click(self, click_x, click_y):
         if super().check_click(click_x, click_y):
             check = True
+            print("Tile_selected")
             for character in self.characters:
                 if character.check_click(click_x, click_y):
                     check = False
@@ -76,6 +77,11 @@ class Building(Clickable):
     def check_pos(self):
         print(self.rect.x)
 
+    def draw_stat(self, window):
+        test = self.config.assets.get('test_stat')
+        w, h = self.rect.w, self.rect.h
+        x, y = self.rect.x + w/2 - test.get_size()[0] / 2, self.rect.y
+        window.blit(test, (x, y))
 
 class Button(Clickable):
     def __init__(self, x, y, image, config):

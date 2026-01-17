@@ -21,8 +21,8 @@ class Board:
                 y = self.config.INITIAL_OFFSET_Y + (self.config.HALF_HEIGHT * column) + self.config.HALF_HEIGHT * row
                 self.tiles[column].append(Tile(tile_type, x, y, column, row, self.config, id))
                 id += 1
-                #if tile_type != TileType.BLANK:
-                #    self.tiles[column][row].building.append(Building(x + self.config.HALF_WIDTH, y+self.config.HALF_HEIGHT, column, row, self.config))
+                if tile_type != TileType.BLANK:
+                    self.tiles[column][row].building.append(Building(x + self.config.HALF_WIDTH, y+self.config.HALF_HEIGHT, column, row, self.config))
 
     def draw_board(self, window):
         for column_tiles in self.tiles:
