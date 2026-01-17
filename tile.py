@@ -19,7 +19,7 @@ class Clickable:
 
     def draw(self, window):
         window.blit(self.image, self.rect.topleft) # print where top left of rectangle is
-        pygame.draw.rect(window, (255, 0, 0), (self.rect.x, self.rect.y, self.rect.width, self.rect.height), 2 )
+        #pygame.draw.rect(window, (255, 0, 0), (self.rect.x, self.rect.y, self.rect.width, self.rect.height), 2 )
 
 
 class Tile(Clickable):
