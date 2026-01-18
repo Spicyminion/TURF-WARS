@@ -6,6 +6,7 @@ class Game:
     def __init__(self, window, config):
         self.window = window
         self.config = config
+        self.players = []
         self._init()
 
     def _init(self):
@@ -23,9 +24,13 @@ class Game:
         print(self.board.tiles[col][row].check_click(x, y))
 
     def get_button(self, x, y):
-        print(self.ui.check_buttons(x, y))
+        self.ui.check_buttons(x, y)
 
     def check_all(self, d1, d2, x, y ):
         for build in self.board.tiles[d1][d2].building:
             if build.check_click(x, y):
                 build.draw_stat(self.window)
+
+    def zoom(self):
+        self.zoom = self.zoom * 1.2
+        self.config.update_zoom(self.zoom)

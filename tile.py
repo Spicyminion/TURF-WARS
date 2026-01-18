@@ -85,7 +85,6 @@ class Building(Clickable):
 
 class Button(Clickable):
     def __init__(self, x, y, image, config):
-
         use_image = config.assets.get(image)
         super().__init__(x, y, use_image)
         self.config = config

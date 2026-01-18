@@ -3,6 +3,7 @@ from constants import HALF_HEIGHT, HALF_WIDTH, DIMENSION
 from game import Game
 from board import UI
 from config import ConfigGame
+from player import Player
 
 ###############################
 # Init screen and load assets #
@@ -54,6 +55,7 @@ def main():
     running = True
     SCREEN.fill((255, 255, 255))
     game = Game(SCREEN, config)  # initialize game
+    game.players = [Player(1),Player(2)]
     while running:
 
         clock.tick(FPS)
@@ -64,13 +66,14 @@ def main():
                 if event.button == 1:
                     x, y = pygame.mouse.get_pos()
                     if game.get_button(x, y):
-                        None
+                        pass
                     else:
                         d1, d2 = calc_tile_coord(x, y)
                         if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
                             print(f"x,y: {d1, d2}")
                             game.get_space(d1, d2, x, y)
-
+                elif event.button == 2:
+                    pass
             elif event.type == pygame.QUIT:
                 running = False
 
