@@ -11,6 +11,8 @@ class TileType(Enum):
     HOUSE = 4
     MALL = 5
 
+
+
 layout = [
     [TileType.BASE,         TileType.SPAWN_CIRCLE,  TileType.BLANK,     TileType.LOCK_SPACE,    TileType.BLANK, TileType.SPAWN_CIRCLE,  TileType.BASE,],
     [TileType.SPAWN_CIRCLE, TileType.BLANK,         TileType.BLANK,     TileType.BLANK,         TileType.BLANK, TileType.BLANK,         TileType.SPAWN_CIRCLE,],
