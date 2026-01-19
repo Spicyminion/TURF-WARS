@@ -6,26 +6,8 @@ class LoadImg:
     def __init__(self, scale_factor):
         self.scale_factor = scale_factor
         self.imgs = {}
-        self.base_imgs = {}
         self.path = os.getcwd()
         self.load_imgs()
-        self.zoom = 1.0
-    '''
-    def load_imgs(self):
-        for file in os.listdir(self.path):
-            if file.lower().endswith(".png") and "block" in file:
-                name = os.path.splitext(file)[0] # remove file type
-                img = pygame.image.load(file)
-                w, h = img.get_size()
-                img = pygame.transform.scale(img, (int(w * self.scale_factor * BLOCK_SCALE), int(h * self.scale_factor * BLOCK_SCALE)))
-                self.imgs[name] = img
-            elif file.lower().endswith(".png"):
-                name = os.path.splitext(file)[0]
-                img = pygame.image.load(file)
-                w, h = img.get_size()
-                img = pygame.transform.scale(img, (int(w * self.scale_factor), int(h * self.scale_factor)))
-                self.imgs[name] = img
-    '''
 
     def load_imgs(self):
         for directory in os.listdir(self.path):
@@ -40,7 +22,6 @@ class LoadImg:
                     else:
                         img = pygame.transform.scale(img, (int(w * self.scale_factor), int(h * self.scale_factor)))
                     self.imgs[name] = img
-                    self.base_imgs[name] = img
 
 
     def get(self, name):
@@ -62,16 +43,6 @@ class ConfigGame:
         self.INITIAL_OFFSET_Y = (self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2) # first div brings to mid, 2nd moves up height of half of board
 
         self.assets = LoadImg(self.scale)
-
-    def update_zoom(self, zoom):
-        self.HALF_WIDTH = self.HALF_WIDTH * zoom
-        self.HALF_HEIGHT = self.HALF_HEIGHT * zoom
-        self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH
-        self.INITIAL_OFFSET_Y = (self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2) # first div brings to mid, 2nd moves up height of half of board
-
-        for name, img in self.assets.base_imgs:
-            w, h = img.get_size()
-            self.assets.imgs[name] = pygame.transform.scale(img, (int(w * self.scale * zoom), int(h * self.scale * zoom)))
 
 
 

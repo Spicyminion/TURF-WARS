@@ -1,6 +1,6 @@
 import pygame
 from layout import layout, TileType
-from tile import Tile, Building
+from tile import Tile
 #from constants import
 
 class Board:
@@ -17,23 +17,8 @@ class Board:
             self.tiles.append([])
             for row in range(len(layout[column])):
                 tile_type = layout[column][row]
-                x = self.config.INITIAL_OFFSET_X + (self.config.HALF_WIDTH * column) - self.config.HALF_WIDTH * row
-                y = self.config.INITIAL_OFFSET_Y + (self.config.HALF_HEIGHT * column) + self.config.HALF_HEIGHT * row
-                self.tiles[column].append(Tile(tile_type, x, y, column, row, self.config, id))
+                self.tiles[column].append(Tile(tile_type, column, row))
                 id += 1
-                if tile_type != TileType.BLANK:
-                    self.tiles[column][row].building.append(Building(x + self.config.HALF_WIDTH, y + self.config.HALF_HEIGHT, column, row, self.config))
-
-    def draw_board(self, window):
-        for column_tiles in self.tiles:
-            for tile in column_tiles:
-                tile.draw(window)
-
-    def rotate_board(self):
-        print("hi")
-        # do something
-        #self.draw_board(self, window)
-
 
 class UI:
     def __init__(self):
@@ -47,3 +32,6 @@ class UI:
     def draw_buttons(self, window):
         for button in self.buttons:
             button.draw(window)
+
+
+

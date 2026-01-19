@@ -3,7 +3,7 @@ from constants import HALF_HEIGHT, HALF_WIDTH, DIMENSION
 from game import Game
 from board import UI
 from config import ConfigGame
-from player import Player
+from player import Player, PlayerCamera
 
 ###############################
 # Init screen and load assets #
@@ -55,7 +55,9 @@ def main():
     running = True
     SCREEN.fill((255, 255, 255))
     game = Game(SCREEN, config)  # initialize game
-    game.players = [Player(1),Player(2)]
+    game.players = [Player(1), Player(2)]
+    game.make_cameras()
+    game.draw_camera(1)
     while running:
 
         clock.tick(FPS)
@@ -65,24 +67,41 @@ def main():
                 # event == 1 is L_click, == 2 is middle_button, == 3, is R_click
                 if event.button == 1:
                     x, y = pygame.mouse.get_pos()
-                    if game.get_button(x, y):
-                        pass
-                    else:
-                        d1, d2 = calc_tile_coord(x, y)
-                        if  0 <= d1 <= (DIMENSION-1) and 0 <= d2 <= (DIMENSION-1):
-                            print(f"x,y: {d1, d2}")
-                            game.get_space(d1, d2, x, y)
+                    game.check_pos(x, y)
+
                 elif event.button == 2:
                     pass
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_z:
+                    game.zoom_in()
+                    print("zooming in")
+                elif event.key == pygame.K_x:
+                    game.zoom_out()
+                    print("zooming out")
+                elif event.key == pygame.K_UP:
+                    game.move_y(-20)
+                elif event.key == pygame.K_DOWN:
+                    game.move_y(20)
+                elif event.key == pygame.K_LEFT:
+                    game.move_x(-20)
+                elif event.key == pygame.K_RIGHT:
+                    game.move_x(20)
+                elif event.key == pygame.K_t:
+                    game.change_turn()
+                elif event.key == pygame.K_r:
+                    game.rotate(1)
+
+
             elif event.type == pygame.QUIT:
                 running = False
-
+            '''
             else:
                 x, y = pygame.mouse.get_pos()
                 d1, d2 = calc_tile_coord(x, y)
                 if 0 <= d1 <= (DIMENSION - 1) and 0 <= d2 <= (DIMENSION - 1):
                     game.check_all(d1, d2, x, y)
-
+            '''
 
             pygame.display.flip()
 
