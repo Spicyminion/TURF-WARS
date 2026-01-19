@@ -1,6 +1,6 @@
 import pygame
 from constants import COLOR_KEY
-from layout import TileType
+from layout import TileType, TILETYPE_TO_SPRITE
 #import constants
 
 class Tile():
@@ -8,6 +8,7 @@ class Tile():
         self.row = row
         self.col = col
         self.type = type
+        self.img_key = TILETYPE_TO_SPRITE[type]
         self.characters = []
         self.building = []
 
@@ -23,28 +24,26 @@ class Tile():
                         print("building clicked!")
                         break
 
-'''
-class Building(Clickable):
-    def __init__(self, x, y, col, row, config):
-
+class Building():
+    def __init__(self, col, row, config):
         img = config.assets.get('apartment')
         w, h = img.get_size()
-        x = x - w / 2
-        y = y - h / 2
-        super().__init__(x, y, img)
+        #x = x - w / 2
+        #y = y - h / 2
         self.config = config
         self.row = row
         self.col = col
 
-    def check_pos(self):
-        print(self.rect.x)
-
-    def draw_stat(self, window):
+    '''
+    def draw_stat(self, window, x, y):
         test = self.config.assets.get('test_stat')
         w, h = self.rect.w, self.rect.h
         x, y = self.rect.x + w/2 - test.get_size()[0] / 2, self.rect.y
         window.blit(test, (x, y))
+    '''
 
+
+'''
 class Button(Clickable):
     def __init__(self, x, y, image, config):
         use_image = config.assets.get(image)

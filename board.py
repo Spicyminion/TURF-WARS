@@ -1,6 +1,6 @@
 import pygame
 from layout import layout, TileType
-from tile import Tile
+from tile import Tile, Building
 #from constants import
 
 class Board:
@@ -19,6 +19,10 @@ class Board:
                 tile_type = layout[column][row]
                 self.tiles[column].append(Tile(tile_type, column, row))
                 id += 1
+                if column == 1 and row == 1:
+                    tile = self.tiles[column][row]
+                    tile.building.append(Building(column, row, self.config))
+
 
 class UI:
     def __init__(self):

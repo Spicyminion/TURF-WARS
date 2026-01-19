@@ -3,7 +3,8 @@ from pygame.examples.scroll import zoom_factor
 from scipy.signal import zoom_fft
 
 from layout import layout, TileType
-from constants import DIMENSION
+from constants import DIMENSION, HALF_HEIGHT
+
 
 class Player:
 
@@ -38,21 +39,53 @@ class PlayerCamera:
 
         for name,img in self.config.assets.imgs.items():
             self.local_imgs[name] = img
+        self.update_masks()
 
     def draw(self, window, img, x, y):
         window.blit(img, (x, y))  # print where top left of rectangle is
 
     def draw_all(self):
-        for column in range(len(layout)):
-            for row in range(len(layout[column])):
-                x = self.INITIAL_OFFSET_X + (self.HALF_WIDTH * column) - self.HALF_WIDTH * row
-                y = self.INITIAL_OFFSET_Y + (self.HALF_HEIGHT * column) + self.HALF_HEIGHT * row
-                tile = self.board.tiles[row][column]
-                if tile.type == TileType.BLANK:
-                    img = self.local_imgs['grass_block']
+
+        for col in range(len(layout)):
+            for row in range(len(layout[col])):
+
+                if self.camera_rotation_offset == 1:
+                    col_rot = row
+                    row_rot = DIMENSION - 1 - col
+                elif self.camera_rotation_offset == 2:
+                    col_rot = DIMENSION - 1 - col
+                    row_rot = DIMENSION - 1 - row
+                elif self.camera_rotation_offset == 3:
+                    col_rot = DIMENSION - 1 - row
+                    row_rot = col
                 else:
-                    img = self.local_imgs['clicked_block']
+                    col_rot = col
+                    row_rot = row
+
+                tile = self.board.tiles[col_rot][row_rot]
+                img = self.local_imgs[tile.img_key]
+
+                x = (
+                        self.INITIAL_OFFSET_X
+                        + (self.HALF_WIDTH * col)
+                        - (self.HALF_WIDTH * row)
+                )
+                y = (
+                        self.INITIAL_OFFSET_Y +
+                        (self.HALF_HEIGHT * col) +
+                        (self.HALF_HEIGHT * row)
+                )
+
                 self.window.blit(img, (x, y))
+
+                for struct in tile.building:
+                    img = self.local_imgs['apartment']
+                    w, h = img.get_size()
+                    build_x = x + self.HALF_WIDTH - w/2
+                    build_y = y + self.HALF_HEIGHT - h/2
+                    self.window.blit(img, (build_x, build_y))
+
+
 
 
     def update_imgs(self):
@@ -62,10 +95,16 @@ class PlayerCamera:
             self.local_imgs[name] = img
         self.HALF_WIDTH =  self.initial_half_width * self.zoom_level
         self.HALF_HEIGHT = self.initial_half_height * self.zoom_level
-        self.INITIAL_OFFSET_X = (self.config.screen_width / 2) - self.HALF_WIDTH + self.camera_offset_x
-        self.INITIAL_OFFSET_Y = ((self.config.screen_height / 2) -
-                                 (self.HALF_HEIGHT * 2 * DIMENSION / 2)  +
-                                 self.camera_offset_y) # first div brings to mid, 2nd moves up height of half
+        self.INITIAL_OFFSET_X = ((
+                                self.config.screen_width / 2)
+                                 - self.HALF_WIDTH
+                                 + self.camera_offset_x
+                                 )
+        self.INITIAL_OFFSET_Y = (
+                                (self.config.screen_height / 2)
+                                - (self.HALF_HEIGHT * 2 * DIMENSION / 2)  +
+                                 self.camera_offset_y
+                                ) # first div brings to mid, 2nd moves up height of half
         self.draw_all()
 
     def update_masks(self):
@@ -73,15 +112,6 @@ class PlayerCamera:
             mask = pygame.mask.from_threshold(img, (0, 0, 0), (1, 1, 1, 255))
             mask.invert()
             self.img_masks[name] = mask
-
-
-    def check_click(self, row, col, x, y):
-        rect =
-        if not self.rect.collidepoint(click_x, click_y):  # check if clicked inside where the rect is (in realspace)
-            return False
-        check_x, check_y = (click_x - self.rect.x, click_y - self.rect.y)  # recenter around top_L 0,0
-        # print(check_x, check_y)
-        return self.mask.get_at((check_x, check_y))  # check if the click is within the boundaries of the image
 
     def convert_click(self, x, y):
         pass
@@ -106,17 +136,14 @@ class PlayerCamera:
 
             tile_x = self.INITIAL_OFFSET_X + (self.HALF_WIDTH * col) - self.HALF_WIDTH * row
             tile_y = self.INITIAL_OFFSET_Y + (self.HALF_HEIGHT * col) + self.HALF_HEIGHT * row
-            image = self.local_imgs['grass_block']
+            image = self.local_imgs['grass_block'] # every tile will have the same mask
             rect = image.get_rect(topleft=(tile_x, tile_y))  # create a rectangle from the top left coord of the image (treat as x,y)
-            mask = pygame.mask.from_threshold(image, (0, 0, 0), (1, 1, 1, 255))
-            mask.invert()
-            if not rect.collidepoint(x, y):  # check if clicked inside where the rect is (in realspace)
-                print("nope")
-                return False
+            mask = self.img_masks['grass_block']
+            #mask.invert()
+            #if not rect.collidepoint(x, y):  # check if clicked inside where the rect is (in realspace)
+            #    print("nope")
+            #    return False
             check_x, check_y = (x - rect.x, y - rect.y)  # recenter around top_L 0,0
-            print(check_x, check_y)
-            # print(check_x, check_y)
-
             if self.camera_rotation_offset == 1:
                 col, row = row, DIMENSION - 1 - col
             elif self.camera_rotation_offset == 2:
@@ -124,9 +151,7 @@ class PlayerCamera:
                 row = DIMENSION - 1 - row
             elif self.camera_rotation_offset == 3:
                 col, row = DIMENSION - 1 - row, col
-
             return col, row, mask.get_at((round(check_x), round(check_y)))  # check if the click is within the boundaries of the image
-            #return col, row
 
         else:
             return None

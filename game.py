@@ -58,7 +58,7 @@ class Game:
         cam.update_imgs()
 
     def move_x(self, increment):
-        cam = self.cameras[self.player_turn - 1]
+        cam = self.cameras[self.player_turn-1]
         cam.camera_offset_x += increment
         cam.update_imgs()
 
@@ -72,12 +72,6 @@ class Game:
         else:
             cam.camera_rotation_offset += direction
         cam.update_imgs()
-
-        # TOP L QUADRANT: if row > col
-        # TOP R QUADRANT: if row <= col
-        # BOT R QUADRANT: if 2D > 1D
-        # BOT L QUADRANT: if 2D > 1D
-
 
     def change_turn(self):
         if self.player_turn == len(self.players):

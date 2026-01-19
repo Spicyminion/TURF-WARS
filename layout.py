@@ -3,6 +3,8 @@ from enum import Enum
 # 1D is x-axis, 2D is y-axis (they are printed diagonally downwards from R to L) * imagine array rotated 45 deg. left
 # 0 = blank space, 1 = base, 2 = spawn_circle, 3 = lock_space, 4 = house, 5 = mall
 
+
+
 class TileType(Enum):
     BLANK = 0
     BASE = 1
@@ -11,6 +13,14 @@ class TileType(Enum):
     HOUSE = 4
     MALL = 5
 
+TILETYPE_TO_SPRITE = {
+    TileType.BLANK: "grass_block",
+    TileType.BASE: "clicked_block",
+    TileType.SPAWN_CIRCLE: "clicked_block",
+    TileType.LOCK_SPACE: "clicked_block",
+    TileType.HOUSE: "clicked_block",
+    TileType.MALL: "clicked_block",
+}
 
 
 layout = [
