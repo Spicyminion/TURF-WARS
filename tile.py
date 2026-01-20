@@ -26,7 +26,7 @@ class Tile():
 
 class Building():
     def __init__(self, col, row, config):
-        img = config.assets.get('apartment')
+        img = config.assets.get('Apartment-1b')
         w, h = img.get_size()
         #x = x - w / 2
         #y = y - h / 2

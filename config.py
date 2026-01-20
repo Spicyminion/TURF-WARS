@@ -15,7 +15,8 @@ class LoadImg:
             if dir_path and dir_path.endswith("_imgs"):
                 for png in os.listdir(dir_path):
                     name = os.path.splitext(png)[0] # remove file type
-                    img = pygame.image.load(os.path.join(dir_path, png))
+                    img = pygame.image.load(os.path.join(dir_path, png)).convert()
+                    img.set_colorkey((0, 0, 0))
                     w, h = img.get_size()
                     if png.lower().endswith(".png") and "block" in png:
                         img = pygame.transform.scale(img, (int(w * self.scale_factor * BLOCK_SCALE), int(h * self.scale_factor * BLOCK_SCALE)))
@@ -42,6 +43,7 @@ class ConfigGame:
         self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH
         self.INITIAL_OFFSET_Y = (self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2) # first div brings to mid, 2nd moves up height of half of board
 
+    def load_imgs(self):
         self.assets = LoadImg(self.scale)
 
 

@@ -15,6 +15,7 @@ pygame.init()
 res = pygame.display.Info()
 config = ConfigGame(res.current_w, res.current_h)
 SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
+config.load_imgs()
 
 # Update image sizes
 
@@ -50,20 +51,28 @@ def calc_tile_coord(x, y):
 clock = pygame.time.Clock()
 FPS = 60
 
-def main():
+event_keys = []
 
+
+def main():
+    global event_keys
     running = True
     SCREEN.fill((255, 255, 255))
     game = Game(SCREEN, config)  # initialize game
     game.players = [Player(1), Player(2)]
     game.make_cameras()
-    game.draw_camera(1)
+
     while running:
+
+        pygame.display.flip()
 
         clock.tick(FPS)
 
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.QUIT:
+                running = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 # event == 1 is L_click, == 2 is middle_button, == 3, is R_click
                 if event.button == 1:
                     x, y = pygame.mouse.get_pos()
@@ -74,13 +83,13 @@ def main():
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_z:
-                    game.zoom_in()
+                    game.zoom(1)
                     print("zooming in")
                 elif event.key == pygame.K_x:
-                    game.zoom_out()
+                    game.zoom(-1)
                     print("zooming out")
                 elif event.key == pygame.K_UP:
-                    game.move_y(-20)
+                        game.move_y(-20)
                 elif event.key == pygame.K_DOWN:
                     game.move_y(20)
                 elif event.key == pygame.K_LEFT:
@@ -91,10 +100,10 @@ def main():
                     game.change_turn()
                 elif event.key == pygame.K_r:
                     game.rotate(1)
+                elif event.key == pygame.K_c:
+                     game.center_board()
+            #'''
 
-
-            elif event.type == pygame.QUIT:
-                running = False
             '''
             else:
                 x, y = pygame.mouse.get_pos()
@@ -111,3 +120,16 @@ def main():
     pygame.quit()
 
 main()
+
+'''
+elif event.type == pygame.KEYDOWN:
+    event_keys.append('test')
+
+elif event.type == pygame.KEYUP:
+    event = []
+
+else:
+    if len(event_keys) > 0:
+        game.move_x(20)
+
+'''

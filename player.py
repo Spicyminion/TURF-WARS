@@ -79,7 +79,7 @@ class PlayerCamera:
                 self.window.blit(img, (x, y))
 
                 for struct in tile.building:
-                    img = self.local_imgs['apartment']
+                    img = self.local_imgs['Apartment-1b']
                     w, h = img.get_size()
                     build_x = x + self.HALF_WIDTH - w/2
                     build_y = y + self.HALF_HEIGHT - h/2
@@ -105,7 +105,7 @@ class PlayerCamera:
                                 - (self.HALF_HEIGHT * 2 * DIMENSION / 2)  +
                                  self.camera_offset_y
                                 ) # first div brings to mid, 2nd moves up height of half
-        self.draw_all()
+        #self.draw_all()
 
     def update_masks(self):
         for name, img in self.local_imgs.items():
@@ -115,6 +115,17 @@ class PlayerCamera:
 
     def convert_click(self, x, y):
         pass
+
+    def center_board(self):
+        self.HALF_WIDTH = self.initial_half_width
+        self.HALF_HEIGHT = self.initial_half_height
+        self.camera_offset_x = 0
+        self.camera_offset_y = 0
+        self.camera_rotation_offset = 0
+        self.zoom_level = 1.0
+        self.update_masks()
+        self.update_imgs()
+        #self.draw_all()
 
     def calculate_position(self, x, y):
         # Recenter to remove any visual adjustments (zoom, rotation, camera movement)

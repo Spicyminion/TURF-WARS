@@ -41,16 +41,16 @@ class Game:
             self.cameras.append(PlayerCamera(
                 player, self.window, self.config, self.board,
                 self.config.INITIAL_OFFSET_X, self.config.INITIAL_OFFSET_Y, self.config.HALF_WIDTH, self.config.HALF_HEIGHT))
+        self.draw_camera(1)
 
-    def zoom_in(self):
+    def zoom(self, zoom):
         cam = self.cameras[self.player_turn-1]
-        cam.zoom_level+=1
-        cam.update_imgs()
-
-    def zoom_out(self):
-        cam = self.cameras[self.player_turn-1]
-        cam.zoom_level-=1
-        cam.update_imgs()
+        check = cam.zoom_level + zoom
+        if check < 1 or check > 3:
+            pass
+        else:
+            cam.zoom_level+=zoom
+            cam.update_imgs()
 
     def move_y(self, increment):
         cam = self.cameras[self.player_turn-1]
@@ -78,3 +78,7 @@ class Game:
             self.player_turn = 1
         else:
             self.player_turn += 1
+
+    def center_board(self):
+        cam = self.cameras[self.player_turn-1]
+        cam.center_board()
