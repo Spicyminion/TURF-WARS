@@ -44,6 +44,16 @@ class PlayerCamera:
     def draw(self, window, img, x, y):
         window.blit(img, (x, y))  # print where top left of rectangle is
 
+    def game_to_camera(self, x, y):
+        pass
+
+    def camera_to_game(self, x, y):
+
+        x = (x * zoom_factor) + self.camera_offset_x
+        y = (y * zoom_factor) + self.camera_offset_y
+
+        return x, y
+
     def draw_all(self):
 
         for col in range(len(layout)):
@@ -85,7 +95,9 @@ class PlayerCamera:
                     build_y = y + self.HALF_HEIGHT - h/2
                     self.window.blit(img, (build_x, build_y))
 
-
+        for button in self.board.buttons:
+            img = self.local_imgs['apartment']
+            self.window.blit(img, (button.x, button.y))
 
 
     def update_imgs(self):
@@ -128,14 +140,27 @@ class PlayerCamera:
         #self.draw_all()
 
     def calculate_position(self, x, y):
+
+        # First check if a button is clicked, if not, then check if a tile is clicked
+
+        for button in self.game.UI:
+            img = self.local_imgs['apartment']
+            rect = img.get_rect(topleft=(button.x, button.y))
+            mask = self.img_masks['apartment']
+            if rect.collidepoint(x, y):
+                check_x, check_y = x - button.x, y- button.y
+                if mask.get_at((check_x, check_y)):
+                    print("button clicked!")
+
         # Recenter to remove any visual adjustments (zoom, rotation, camera movement)
         cx, cy = x - self.INITIAL_OFFSET_X - self.HALF_WIDTH, y - self.INITIAL_OFFSET_Y
+        #cx, cy = x - self.INITIAL_OFFSET_X, y - self.INITIAL_OFFSET_Y
 
         # Now normalize x & y coords to width and height of each tile respectively (units for moving)
         nx = cx / self.HALF_WIDTH
         ny = cy / self.HALF_HEIGHT
 
-        # Next convert into x, y within range of (7,7) 7x7 tiles
+        # Next convert into x, y within range of (6,6) 7x7 tiles (0-based idx)
         gx = (nx + ny) / 2
         gy = (ny - nx) / 2
 
@@ -147,14 +172,15 @@ class PlayerCamera:
 
             tile_x = self.INITIAL_OFFSET_X + (self.HALF_WIDTH * col) - self.HALF_WIDTH * row
             tile_y = self.INITIAL_OFFSET_Y + (self.HALF_HEIGHT * col) + self.HALF_HEIGHT * row
-            image = self.local_imgs['grass_block'] # every tile will have the same mask
-            rect = image.get_rect(topleft=(tile_x, tile_y))  # create a rectangle from the top left coord of the image (treat as x,y)
-            mask = self.img_masks['grass_block']
+            image = self.local_imgs['grass_block']              # every tile will have the same mask
+            rect = image.get_rect(topleft=(tile_x, tile_y))     # create a rectangle from the top left coord of the image (treat as x,y)
+            mask = self.img_masks['grass_block']                # mask is inside a rect starting from 0,0 top left
+            print(f"x, y:{x, y} | tile_origin:{tile_x, tile_y}")
             #mask.invert()
-            #if not rect.collidepoint(x, y):  # check if clicked inside where the rect is (in realspace)
-            #    print("nope")
-            #    return False
-            check_x, check_y = (x - rect.x, y - rect.y)  # recenter around top_L 0,0
+            if not rect.collidepoint(x, y):  # check if clicked inside where the rect is (in realspace)
+                print("nope")
+                return False
+            check_x, check_y = (x - tile_x, y - tile_y)  # recenter around top_L 0,0
             if self.camera_rotation_offset == 1:
                 col, row = row, DIMENSION - 1 - col
             elif self.camera_rotation_offset == 2:

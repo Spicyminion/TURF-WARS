@@ -1,7 +1,7 @@
 import pygame
 from board import Board, UI
 from player import PlayerCamera
-#rom tile import Button
+from tile import Button
 class Game:
 
     def __init__(self, window, config):
@@ -15,8 +15,8 @@ class Game:
     def _init(self):
         self.board = Board(self.window, self.config)
         self.ui = UI()
-        #self.ui.buttons.append(Button(10, 10, 'apartment', self.config))
-        self.ui.draw_buttons(self.window)
+        self.ui.buttons.append(Button(10, 10, self.change_turn()))
+        #self.ui.draw_buttons(self.window)
 
     def draw_camera(self, player_turn):
         self.cameras[player_turn-1].draw_all()  # -1 for 0-based indexing
@@ -82,3 +82,10 @@ class Game:
     def center_board(self):
         cam = self.cameras[self.player_turn-1]
         cam.center_board()
+
+    def draw_board(self, x, y):
+        pass
+'''
+class MoveCommand():
+    def __init__(self):
+'''

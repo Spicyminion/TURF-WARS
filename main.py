@@ -17,33 +17,6 @@ config = ConfigGame(res.current_w, res.current_h)
 SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
 config.load_imgs()
 
-# Update image sizes
-
-
-################################################
-# Funcs for determining which button or tile is L_clicked #
-################################################
-
-
-def calc_tile_coord(x, y):
-
-    # First we need to center the coordinates with respect to top of board
-    cx, cy = x - config.INITIAL_OFFSET_X - config.HALF_WIDTH, y - config.INITIAL_OFFSET_Y
-
-    # Now normalize x & y coords to width and height of each tile respectively (units for moving)
-    nx = cx / config.HALF_WIDTH
-    ny = cy / config.HALF_HEIGHT
-
-    # Next convert into x, y within range of (7,7) 7x7 tiles
-    gx = (nx + ny) / 2
-    gy = (ny - nx) / 2
-
-    # Compute which tile is being used
-    row = int(gx)
-    col = int(gy)
-
-    return row, col
-
 ######################################################
 # Main loop for continuously checking for new inputs #
 ######################################################
@@ -51,11 +24,15 @@ def calc_tile_coord(x, y):
 clock = pygame.time.Clock()
 FPS = 60
 
+
+event_dict = {}
 event_keys = []
 
 
 def main():
     global event_keys
+    global event_dict
+
     running = True
     SCREEN.fill((255, 255, 255))
     game = Game(SCREEN, config)  # initialize game
@@ -88,23 +65,14 @@ def main():
                 elif event.key == pygame.K_x:
                     game.zoom(-1)
                     print("zooming out")
-                elif event.key == pygame.K_UP:
-                        game.move_y(-20)
-                elif event.key == pygame.K_DOWN:
-                    game.move_y(20)
-                elif event.key == pygame.K_LEFT:
-                    game.move_x(-20)
-                elif event.key == pygame.K_RIGHT:
-                    game.move_x(20)
                 elif event.key == pygame.K_t:
                     game.change_turn()
                 elif event.key == pygame.K_r:
                     game.rotate(1)
                 elif event.key == pygame.K_c:
                      game.center_board()
-            #'''
 
-            '''
+            '''         
             else:
                 x, y = pygame.mouse.get_pos()
                 d1, d2 = calc_tile_coord(x, y)
@@ -112,7 +80,18 @@ def main():
                     game.check_all(d1, d2, x, y)
             '''
 
-            pygame.display.flip()
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_UP]:
+            game.move_y(-5)
+        elif keys[pygame.K_DOWN]:
+            game.move_y(5)
+        elif keys[pygame.K_LEFT]:
+            game.move_x(-5)
+        elif keys[pygame.K_RIGHT]:
+            game.move_x(5)
+
+        pygame.display.flip()
 
         SCREEN.fill((255,255,255))
         game.update()
@@ -120,16 +99,3 @@ def main():
     pygame.quit()
 
 main()
-
-'''
-elif event.type == pygame.KEYDOWN:
-    event_keys.append('test')
-
-elif event.type == pygame.KEYUP:
-    event = []
-
-else:
-    if len(event_keys) > 0:
-        game.move_x(20)
-
-'''

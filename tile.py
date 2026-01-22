@@ -3,7 +3,7 @@ from constants import COLOR_KEY
 from layout import TileType, TILETYPE_TO_SPRITE
 #import constants
 
-class Tile():
+class Tile:
     def __init__(self, type, col, row):
         self.row = row
         self.col = col
@@ -24,7 +24,7 @@ class Tile():
                         print("building clicked!")
                         break
 
-class Building():
+class Building:
     def __init__(self, col, row, config):
         img = config.assets.get('Apartment-1b')
         w, h = img.get_size()
@@ -43,14 +43,17 @@ class Building():
     '''
 
 
-'''
-class Button(Clickable):
-    def __init__(self, x, y, image, config):
-        use_image = config.assets.get(image)
-        super().__init__(x, y, use_image)
-        self.config = config
 
-    def check_click(self, click_x, click_y):
-        if super().check_click(click_x, click_y):
-            print("button clicked!")
-'''
+class Button:
+    def __init__(self, x, y, command):
+        self.x = x
+        self.y = y
+        self.command = command
+
+    def get_rect(self):
+        return self.x, self.y
+
+    def on_click(self):
+        self.command.execute()
+
+

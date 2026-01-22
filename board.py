@@ -1,6 +1,6 @@
 import pygame
 from layout import layout, TileType
-from tile import Tile, Building
+from tile import Tile, Building, Button
 #from constants import
 
 class Board:
@@ -22,6 +22,11 @@ class Board:
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
                     tile.building.append(Building(column, row, self.config))
+
+    def draw(self, camera):
+        for column in range(len(layout)):
+            for row in range(len(layout[column])):
+                pass
 
 
 class UI:
