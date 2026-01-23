@@ -1,5 +1,6 @@
 import pygame
 from pygame.examples.scroll import zoom_factor
+from pygame.pypm import Initialize
 from scipy.signal import zoom_fft
 
 from layout import layout, TileType
@@ -45,7 +46,9 @@ class PlayerCamera:
         window.blit(img, (x, y))  # print where top left of rectangle is
 
     def game_to_camera(self, x, y):
-        pass
+
+        x = x + self.INITIAL_OFFSET_X + self.camera_offset_x
+
 
     def camera_to_game(self, x, y):
 

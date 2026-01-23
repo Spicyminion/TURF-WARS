@@ -3,6 +3,9 @@ from layout import layout, TileType
 from tile import Tile, Building, Button
 #from constants import
 
+#class BoardState()
+
+
 class Board:
 
     def __init__(self, window, config):
@@ -26,7 +29,10 @@ class Board:
     def draw(self, camera):
         for column in range(len(layout)):
             for row in range(len(layout[column])):
-                pass
+
+
+
+#class Board
 
 
 class UI:

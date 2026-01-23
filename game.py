@@ -27,10 +27,10 @@ class Game:
     def get_button(self, x, y):
         self.ui.check_buttons(x, y)
 
-    def check_pos(self, x, y):
-        print("checking...")
-        print(self.cameras[self.player_turn-1].calculate_position(x, y))
-    '''
+    def check_pos(self, x, y, ):
+
+
+
     def check_all(self, d1, d2, x, y ):
         for build in self.board.tiles[d1][d2].building:
             if build.check_click(x, y):
@@ -83,8 +83,8 @@ class Game:
         cam = self.cameras[self.player_turn-1]
         cam.center_board()
 
-    def draw_board(self, x, y):
-        pass
+    def draw_board(self):
+
 '''
 class MoveCommand():
     def __init__(self):

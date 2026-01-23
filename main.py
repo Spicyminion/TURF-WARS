@@ -25,13 +25,7 @@ clock = pygame.time.Clock()
 FPS = 60
 
 
-event_dict = {}
-event_keys = []
-
-
 def main():
-    global event_keys
-    global event_dict
 
     running = True
     SCREEN.fill((255, 255, 255))
