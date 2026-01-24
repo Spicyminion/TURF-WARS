@@ -4,11 +4,10 @@ from player import PlayerCamera
 from tile import Button
 class Game:
 
-    def __init__(self, window, config):
+    def __init__(self, window, config, NUM_OF_PLAYERS):
         self.window = window
         self.config = config
         self.players = []
-        self.cameras = []
         self.player_turn = 1
         self._init()
 
@@ -28,14 +27,14 @@ class Game:
         self.ui.check_buttons(x, y)
 
     def check_pos(self, x, y, ):
-
+        pass
 
 
     def check_all(self, d1, d2, x, y ):
         for build in self.board.tiles[d1][d2].building:
             if build.check_click(x, y):
                 build.draw_stat(self.window)
-    '''
+
     def make_cameras(self):
         for player in self.players:
             self.cameras.append(PlayerCamera(

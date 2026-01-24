@@ -14,6 +14,7 @@ HALF_HEIGHT = 12 * BLOCK_SCALE  # offset dim (half of diamond)
 HALF_WIDTH =  25 * BLOCK_SCALE  # offset dim (half of width)
 DIMENSION = 7
 COLOR_KEY = (0,0,0)
+NUM_OF_PLAYERS = 2
 ##############
 # PNG ASSETS #
 ##############

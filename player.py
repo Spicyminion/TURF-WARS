@@ -9,9 +9,10 @@ from constants import DIMENSION, HALF_HEIGHT
 
 class Player:
 
-    def __init__(self, player_id):
+    def __init__(self, player_id, window):
         self.id = player_id
         self.money = 200
+        self.camera = PlayerCamera
 
 
 class PlayerCamera:

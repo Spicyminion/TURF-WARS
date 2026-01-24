@@ -1,9 +1,8 @@
 import pygame
-from constants import HALF_HEIGHT, HALF_WIDTH, DIMENSION
+from constants import NUM_OF_PLAYERS
 from game import Game
-from board import UI
 from config import ConfigGame
-from player import Player, PlayerCamera
+from player import Player
 
 ###############################
 # Init screen and load assets #
@@ -29,8 +28,7 @@ def main():
 
     running = True
     SCREEN.fill((255, 255, 255))
-    game = Game(SCREEN, config)  # initialize game
-    game.players = [Player(1), Player(2)]
+    game = Game(SCREEN, config, NUM_OF_PLAYERS)  # initialize game
     game.make_cameras()
 
     while running:

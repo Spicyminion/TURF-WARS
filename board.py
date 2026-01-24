@@ -1,7 +1,7 @@
 import pygame
 from layout import layout, TileType
 from tile import Tile, Building, Button
-#from constants import
+from constants import DIMENSION
 
 #class BoardState()
 
@@ -29,6 +29,35 @@ class Board:
     def draw(self, camera):
         for column in range(len(layout)):
             for row in range(len(layout[column])):
+                rotation = camera.rotation_offset
+                if rotation == 1:
+                    column_rot = row
+                    row_rot = DIMENSION - 1 - column
+                elif rotation == 2:
+                    column_rot = DIMENSION - 1 - column
+                    row_rot = DIMENSION - 1 - row
+                elif rotation == 3:
+                    column_rot = DIMENSION - 1 - row
+                    row_rot = column
+                else:
+                    column_rot = column
+                    row_rot = row
+
+                    tile = self.board.tiles[column_rot][row_rot]
+                    img = self.local_imgs[tile.img_key]
+
+                    x = (
+                            self.INITIAL_OFFSET_X
+                            + (self.HALF_WIDTH * column)
+                            - (self.HALF_WIDTH * row)
+                    )
+                    y = (
+                            self.INITIAL_OFFSET_Y +
+                            (self.HALF_HEIGHT * column) +
+                            (self.HALF_HEIGHT * row)
+                    )
+
+                    self.window.blit(img, (x, y))
 
 
 
