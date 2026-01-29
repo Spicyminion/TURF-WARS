@@ -29,7 +29,6 @@ def main():
     running = True
     SCREEN.fill((255, 255, 255))
     game = Game(SCREEN, config, NUM_OF_PLAYERS)  # initialize game
-    game.make_cameras()
 
     while running:
 

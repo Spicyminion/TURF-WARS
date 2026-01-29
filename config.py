@@ -38,9 +38,9 @@ class ConfigGame:
             self.screen_height / 900
         )
 
-        self.HALF_WIDTH = self.scale * 25 * BLOCK_SCALE
+        self.HALF_WIDTH = self.scale * 25 * BLOCK_SCALE  # DEFAULT TILE DIMENSIONS
         self.HALF_HEIGHT = self.scale * 12 * BLOCK_SCALE
-        self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH
+        self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH # subtract to center tile
         self.INITIAL_OFFSET_Y = (self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2) # first div brings to mid, 2nd moves up height of half of board
 
     def load_imgs(self):
