@@ -13,6 +13,7 @@ class TileType(Enum):
     HOUSE = 4
     MALL = 5
 
+'''
 TILETYPE_TO_SPRITE = {
     TileType.BLANK: "grass_block",
     TileType.BASE: "clicked_block",
@@ -21,10 +22,21 @@ TILETYPE_TO_SPRITE = {
     TileType.HOUSE: "clicked_block",
     TileType.MALL: "clicked_block",
 }
+'''
+
+TILETYPE_TO_SPRITE = {
+    TileType.BLANK: "grass_block",
+    TileType.BASE: "grass_block",
+    TileType.SPAWN_CIRCLE: "grass_block",
+    TileType.LOCK_SPACE: "grass_block",
+    TileType.HOUSE: "grass_block",
+    TileType.MALL: "clicked_block",
+}
+
 
 
 layout = [
-    [TileType.BASE,         TileType.SPAWN_CIRCLE,  TileType.BLANK,     TileType.LOCK_SPACE,    TileType.BLANK, TileType.SPAWN_CIRCLE,  TileType.BASE,],
+    [TileType.MALL,         TileType.SPAWN_CIRCLE,  TileType.BLANK,     TileType.LOCK_SPACE,    TileType.BLANK, TileType.SPAWN_CIRCLE,  TileType.BASE,],
     [TileType.SPAWN_CIRCLE, TileType.BLANK,         TileType.BLANK,     TileType.BLANK,         TileType.BLANK, TileType.BLANK,         TileType.SPAWN_CIRCLE,],
     [TileType.BLANK,        TileType.BLANK,         TileType.HOUSE,     TileType.BLANK,         TileType.HOUSE, TileType.BLANK,         TileType.BLANK, ],
     [TileType.LOCK_SPACE,   TileType.BLANK,         TileType.BLANK,     TileType.MALL,          TileType.BLANK, TileType.BLANK,         TileType.LOCK_SPACE, ],

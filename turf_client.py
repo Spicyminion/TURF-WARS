@@ -12,7 +12,6 @@ class Player():
     def __init__(self, x, y, width, height, color):
 
 
-
 def read_pos(str):
     str = str.split(",")
     return int(str[0]), int(str[1])
@@ -32,7 +31,6 @@ def redrawWindow(win,player, player2):
 def main():
     run = True
     n = Network()
-
 
     while run:
 

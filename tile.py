@@ -28,16 +28,29 @@ class Tile:
 
 class Building:
     def __init__(self, col, row, config):
+                 #, tile_x, tile_y, tile_width, tile_height):
         self.img = config.assets.get('Apartment-1b')
         self.config = config
         self.row = row
         self.col = col
+        self.type = type
+        #w, h = self.img.get_size()
+        #self.x = tile_x + tile_width - (w/2)
+        #self.y = tile_y + tile_height - (h/2)
 
-    def draw_building(self, window, tile_height, tile_width, x, y):
+    def get_coord(self, tile_x, tile_y, tile_width, tile_height):
         w, h = self.img.get_size()
-        draw_x = x + tile_width - (w/2)
-        draw_y = y + tile_height - (h/2)
+        draw_x = tile_x + tile_width - (w/2)
+        draw_y = tile_y + tile_height - (h/2)
+        return draw_x, draw_y
+
+    def draw_building(self, window, tile_height, tile_width, tile_x, tile_y):
+        draw_x, draw_y = self.get_coord(tile_x, tile_y, tile_width, tile_height)
         window.blit(self.img, (draw_x, draw_y))
+
+    def check_click(self, tile_height, tile_width, tile_x, tile_y):  # workaround for coordinate logic
+        build_x, build_y = self.get_coord(tile_x, tile_y, tile_width, tile_height, tile_width)
+
 
 
     def draw_stat(self, window, x, y):

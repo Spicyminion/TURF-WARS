@@ -45,12 +45,52 @@ class Board:
             self.tiles.append([])
             for row in range(len(layout[column])):
                 tile_type = layout[column][row]
-                self.tiles[column].append(Tile(tile_type, column, row))
+                x = (
+                        self.camera.OFFSET_X
+                        + (self.HALF_WIDTH * column)
+                        - (self.HALF_WIDTH * row)
+                )
+                y = (
+                        self.camera.OFFSET_Y +
+                        (self.HALF_HEIGHT * column) +
+                        (self.HALF_HEIGHT * row)
+                )
+                #if column == 0 and row == 0:
+                #    print(f"ORIG TILE_X{x} ORIG TILE_Y{y}")
+                self.tiles[column].append(Tile(tile_type, column, row, x + self.HALF_WIDTH, y + self.HALF_HEIGHT))
                 id += 1
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
                     tile.building = Building(column, row, self.config)
 
+    def draw_board(self):
+        for column in range(len(layout)):
+            for row in range(len(layout[column])):
+                rotation = self.camera.rotation_offset
+                if rotation == 1:
+                    column_rot = row
+                    row_rot = DIMENSION - 1 - column
+                elif rotation == 2:
+                    column_rot = DIMENSION - 1 - column
+                    row_rot = DIMENSION - 1 - row
+                elif rotation == 3:
+                    column_rot = DIMENSION - 1 - row
+                    row_rot = column
+                else:
+                    column_rot = column
+                    row_rot = row
+                tile = self.tiles[column_rot][row_rot]
+                #print(f"board: {tile.x, tile.y}")
+                tile_x, tile_y = self.camera.game_to_camera(tile.x, tile.y)
+                #if column == 0 and row == 0 and self.camera.rotation_offset == 1:
+                #    print(f"ROT: {self.camera.rotation_offset} TILE_X:{tile_x}, TILE_Y:{tile_y}")
+
+                img = self.local_imgs[tile.img_key]
+                self.window.blit(img, (tile_x, tile_y))
+                if tile.building:
+                    pass
+
+    '''
     def draw_board(self):
         for column in range(len(layout)):
             for row in range(len(layout[column])):
@@ -86,6 +126,7 @@ class Board:
                 if column_rot == 1 and row_rot == 1:
                     #print(tile.building)
                     tile.building.draw_building(self.window, self.HALF_HEIGHT, self.HALF_WIDTH, x, y)
+    '''
 
     def check_mask(self, click_x, click_y, img_x, img_y, img_type):
         mask = self.img_masks[img_type]  # mask is inside a rect starting from 0,0 top left
@@ -123,7 +164,7 @@ class Board:
         if 0 <= col <= (DIMENSION - 1) and 0 <= row <= (DIMENSION - 1):
             tile_x = self.camera.OFFSET_X + (half_width * col) - half_width * row
             tile_y = self.camera.OFFSET_Y + (half_height * col) + half_height * row
-            check = self.check_mask(x, y, tile_x, tile_y, 'grass_block')
+            check = self.check_mask(x, y, tile_x, tile_y, 'grass_block') # all tiles have same shape
             if check == 1:
                 col_rot, row_rot = col, row
                 if self.camera.rotation_offset == 1:
@@ -135,7 +176,9 @@ class Board:
                     col_rot, row_rot = DIMENSION - 1 - row, col
                 tile = self.tiles[col_rot][row_rot]
                 if tile.building:
-                    self.check_mask()
+                    pass
+                    #self.check_mask()
+                print(col_rot, row_rot, check)
                 return col_rot, row_rot, check
             else:
                 return None

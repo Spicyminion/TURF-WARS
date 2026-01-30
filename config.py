@@ -1,4 +1,4 @@
-from constants import BLOCK_SCALE, DIMENSION
+from constants import BLOCK_SCALE, DIMENSION, HALF_WIDTH
 import pygame
 import os
 
@@ -32,12 +32,11 @@ class ConfigGame:
     def __init__(self, screen_width, screen_height):
         self.screen_width = int(screen_width * 0.9)
         self.screen_height = int(screen_height * 0.9)
-
+        print(self.screen_width, self.screen_height)
         self.scale = min(
             self.screen_width / 1800,  # 1800, 900 are internal resolution
             self.screen_height / 900
         )
-
         self.HALF_WIDTH = self.scale * 25 * BLOCK_SCALE  # DEFAULT TILE DIMENSIONS
         self.HALF_HEIGHT = self.scale * 12 * BLOCK_SCALE
         self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH # subtract to center tile
