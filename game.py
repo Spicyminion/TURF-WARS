@@ -69,7 +69,7 @@ class Game:
     def center_board(self):
         self.camera.center_board()
         self.board.update_masks()
-        self.board.draw_board()
+        #self.board.draw_board()
 
     def draw_board(self):
         self.board.draw_board()

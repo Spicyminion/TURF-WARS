@@ -38,6 +38,7 @@ class Board:
             mask = pygame.mask.from_threshold(img, (0, 0, 0), (1, 1, 1, 255))
             mask.invert()
             self.img_masks[name] = mask
+        self.update_imgs()
 
     def define_grid(self):
         id = 0
@@ -57,7 +58,7 @@ class Board:
                 )
                 #if column == 0 and row == 0:
                 #    print(f"ORIG TILE_X{x} ORIG TILE_Y{y}")
-                self.tiles[column].append(Tile(tile_type, column, row, x + self.HALF_WIDTH, y + self.HALF_HEIGHT))
+                self.tiles[column].append(Tile(tile_type, column, row, x + self.HALF_WIDTH, y + self.HALF_HEIGHT)) # true center
                 id += 1
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
@@ -90,43 +91,8 @@ class Board:
                 if tile.building:
                     pass
 
-    '''
-    def draw_board(self):
-        for column in range(len(layout)):
-            for row in range(len(layout[column])):
-                rotation = self.camera.rotation_offset
-                if rotation == 1:
-                    column_rot = row
-                    row_rot = DIMENSION - 1 - column
-                elif rotation == 2:
-                    column_rot = DIMENSION - 1 - column
-                    row_rot = DIMENSION - 1 - row
-                elif rotation == 3:
-                    column_rot = DIMENSION - 1 - row
-                    row_rot = column
-                else:
-                    column_rot = column
-                    row_rot = row
-
-                tile = self.tiles[column_rot][row_rot]
-                img = self.local_imgs[tile.img_key]
-
-                x = (
-                        self.camera.OFFSET_X
-                        + (self.HALF_WIDTH * column * self.camera.zoom_level)
-                        - (self.HALF_WIDTH * row * self.camera.zoom_level)
-                )
-                y = (
-                        self.camera.OFFSET_Y +
-                        (self.HALF_HEIGHT * column * self.camera.zoom_level) +
-                        (self.HALF_HEIGHT * row * self.camera.zoom_level)
-                )
-
-                self.window.blit(img, (x, y))
-                if column_rot == 1 and row_rot == 1:
-                    #print(tile.building)
-                    tile.building.draw_building(self.window, self.HALF_HEIGHT, self.HALF_WIDTH, x, y)
-    '''
+    def game_to_tile(self, x, y):
+        pass
 
     def check_mask(self, click_x, click_y, img_x, img_y, img_type):
         mask = self.img_masks[img_type]  # mask is inside a rect starting from 0,0 top left
@@ -134,58 +100,65 @@ class Board:
         rect = image.get_rect(
             topleft=(img_x, img_y))  # create a rectangle from the top left coord of the image (treat as x,y)
         if not rect.collidepoint(click_x, click_y):  # check if clicked inside where the rect is (in realspace)
-            print("nope")
+            print("not in rect")
+            return False
+        elif click_x - img_x < 0 or click_y - img_y < 0:
+            print("negative")
             return False
         else:
             check_x, check_y = (click_x - img_x, click_y - img_y)  # recenter around top_L 0,0
             return mask.get_at((round(check_x), round(check_y))) # check if the click is within the boundaries of the image
 
-    def check_click(self, x, y):
+    def check_click(self, screen_x, screen_y):
+        """
+        Check which tile the user clicked on, accounting for:
+        - camera zoom
+        - camera pan
+        - camera rotation
+        """
 
-        # Recenter to remove any visual adjustments (zoom, rotation, camera movement)
+        # 1) Undo all camera transforms → game space
+        gx, gy = self.camera.camera_to_game(screen_x, screen_y)
 
-        cx, cy = x - self.camera.OFFSET_X - self.HALF_WIDTH, y - self.camera.OFFSET_Y  # (0, 0) is top L of top tile
-        # print(f"x,y:{x, y} cx,cy: {cx, cy}")
+        # 2) Translate into tile-local coordinates (0,0 = top-left of top-left tile)
+        cx = gx - self.config.INITIAL_OFFSET_X - self.config.HA
+        cy = gy - self.config.INITIAL_OFFSET_Y
 
-        # Now normalize x & y coords to width and height of each tile respectively (units for moving)
-        half_width = self.HALF_WIDTH * self.camera.zoom_level
-        half_height = self.HALF_HEIGHT * self.camera.zoom_level
-        nx = cx / half_width
-        ny = cy / half_height
+        # 3) Normalize by tile dimensions (diamond width/height)
+        nx = cx / self.HALF_WIDTH
+        ny = cy / self.HALF_HEIGHT
 
-        # Next convert into x, y within range of (6,6) 7x7 tiles (0-based idx)
-        gx = (nx + ny) / 2
-        gy = (ny - nx) / 2
+        # 4) Convert to isometric tile indices
+        col = int((nx + ny) / 2)
+        row = int((ny - nx) / 2)
 
-        # Compute which tile is being used
-        col = int(gx)
-        row = int(gy)
-
-        if 0 <= col <= (DIMENSION - 1) and 0 <= row <= (DIMENSION - 1):
-            tile_x = self.camera.OFFSET_X + (half_width * col) - half_width * row
-            tile_y = self.camera.OFFSET_Y + (half_height * col) + half_height * row
-            check = self.check_mask(x, y, tile_x, tile_y, 'grass_block') # all tiles have same shape
-            if check == 1:
-                col_rot, row_rot = col, row
-                if self.camera.rotation_offset == 1:
-                    col_rot, row_rot = row, DIMENSION - 1 - col
-                elif self.camera.rotation_offset == 2:
-                    col_rot = DIMENSION - 1 - col
-                    row_rot = DIMENSION - 1 - row
-                elif self.camera.rotation_offset == 3:
-                    col_rot, row_rot = DIMENSION - 1 - row, col
-                tile = self.tiles[col_rot][row_rot]
-                if tile.building:
-                    pass
-                    #self.check_mask()
-                print(col_rot, row_rot, check)
-                return col_rot, row_rot, check
-            else:
-                return None
-        else:
+        # Check bounds
+        if not (0 <= col < DIMENSION and 0 <= row < DIMENSION):
             return None
 
+        # 5) Correct indices for rotation
+        rot = self.camera.rotation_offset % 4
+        if rot == 0:
+            col_rot, row_rot = col, row
+        elif rot == 1:  # 90°
+            col_rot, row_rot = row, DIMENSION - 1 - col
+        elif rot == 2:  # 180°
+            col_rot, row_rot = DIMENSION - 1 - col, DIMENSION - 1 - row
+        elif rot == 3:  # 270°
+            col_rot, row_rot = DIMENSION - 1 - row, col
 
+        tile = self.tiles[col_rot][row_rot]
+
+        # 6) Check mask
+        tile_x = tile.x - self.HALF_WIDTH  # top-left
+        tile_y = tile.y - self.HALF_HEIGHT
+        check = self.check_mask(gx, gy, tile_x, tile_y, 'grass_block')
+
+        if check:
+            print(col_rot, row_rot, check)
+            return col_rot, row_rot, check
+        else:
+            return None
 
 #class Board
 
