@@ -13,7 +13,6 @@ class TileType(Enum):
     HOUSE = 4
     MALL = 5
 
-'''
 TILETYPE_TO_SPRITE = {
     TileType.BLANK: "grass_block",
     TileType.BASE: "clicked_block",
@@ -22,17 +21,16 @@ TILETYPE_TO_SPRITE = {
     TileType.HOUSE: "clicked_block",
     TileType.MALL: "clicked_block",
 }
-'''
 
-TILETYPE_TO_SPRITE = {
-    TileType.BLANK: "grass_block",
-    TileType.BASE: "grass_block",
-    TileType.SPAWN_CIRCLE: "grass_block",
-    TileType.LOCK_SPACE: "grass_block",
-    TileType.HOUSE: "grass_block",
-    TileType.MALL: "clicked_block",
+class BuildType(Enum):
+    APARTMENT = 0
+    MALL = 1
+
+BUILDTYPE_TO_SPRITE = {
+    BuildType.APARTMENT: "apartment",
+    BuildType.MALL: "mall ",
+
 }
-
 
 
 layout = [

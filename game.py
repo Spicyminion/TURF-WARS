@@ -27,7 +27,7 @@ class Game:
     def check_all(self, d1, d2, x, y ):
         for build in self.board.tiles[d1][d2].building:
             if build.check_click(x, y):
-                build.draw_stat(self.window)
+                 build.draw_stat(self.window)
 
     def zoom(self, zoom):
         check = self.camera.zoom_level + zoom
@@ -37,7 +37,7 @@ class Game:
             self.camera.zoom_level+=zoom
             self.camera.move_camera()
             self.board.update_imgs()
-            self.board.update_masks()
+            #self.board.update_masks()
             self.board.draw_board()
 
     def move_y(self, increment):
@@ -69,7 +69,7 @@ class Game:
     def center_board(self):
         self.camera.center_board()
         self.board.update_masks()
-        self.board.draw_board()
+        #self.board.draw_board()
 
     def draw_board(self):
         self.board.draw_board()

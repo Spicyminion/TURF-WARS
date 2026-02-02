@@ -44,6 +44,7 @@ def main():
                 # event == 1 is L_click, == 2 is middle_button, == 3, is R_click
                 if event.button == 1:
                     x, y = pygame.mouse.get_pos()
+                    print("### CLICK ###")
                     game.check_pos(x, y)
 
                 elif event.button == 2:

@@ -21,7 +21,7 @@ class LoadImg:
                     if png.lower().endswith(".png") and "block" in png:
                         img = pygame.transform.scale(img, (int(w * self.scale_factor * BLOCK_SCALE), int(h * self.scale_factor * BLOCK_SCALE)))
                     else:
-                        img = pygame.transform.scale(img, (int(w * self.scale_factor), int(h * self.scale_factor)))
+                        img = pygame.transform.scale(img, (int(w * self.scale_factor * 0.5), int(h * self.scale_factor * 0.5)))
                     self.imgs[name] = img
 
 
@@ -39,6 +39,7 @@ class ConfigGame:
         )
         self.HALF_WIDTH = self.scale * 25 * BLOCK_SCALE  # DEFAULT TILE DIMENSIONS
         self.HALF_HEIGHT = self.scale * 12 * BLOCK_SCALE
+        print(f"HALF_WIDTH: {self.HALF_WIDTH}, HALF_HEIGHT: {self.HALF_HEIGHT}")
         self.INITIAL_OFFSET_X = (self.screen_width / 2) - self.HALF_WIDTH # subtract to center tile
         self.INITIAL_OFFSET_Y = (self.screen_height / 2) - (self.HALF_HEIGHT * 2 * DIMENSION / 2) # first div brings to mid, 2nd moves up height of half of board
 
