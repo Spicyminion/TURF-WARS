@@ -10,7 +10,7 @@ clientNumber = 0
 
 class Player():
     def __init__(self, x, y, width, height, color):
-
+        pass
 
 def read_pos(str):
     str = str.split(",")
@@ -33,6 +33,7 @@ def main():
     n = Network()
 
     while run:
+        pass
 
 
 main()
