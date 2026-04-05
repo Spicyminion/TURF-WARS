@@ -13,9 +13,9 @@ json_string = '''
         ]
     }
 '''
-
 data = json.loads(json_string)  # converts to a python dictionary
 data['test'] = True
+
 new_json = json.dumps(data, indent=2, sort_keys=True) # convert python dict to json string (format)
 
 addr = ("192.168.1.95", 5555)  # Server IP, Port
@@ -30,13 +30,15 @@ server.listen(5)
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 client.connect(addr)
-conn, addr = server.accept()    # conn is how the server will communicate with the client
-print(conn)
+conn, addr = server.accept()    # conn is how the server will communicate with the client, need to accept the connect
+print(f"Connection Accepted: {conn} Addr: {addr}")
 
 
-client.send(str.encode("hello"))
+client.send(new_json.encode())  # converts to a reg string (remember to reconvert to JSON)
 msg = conn.recv(1024).decode()
-print(msg)
+reload = json.loads(msg)
+print(reload['students'][0])
+
 
 
 def chat_test():
@@ -56,6 +58,8 @@ while True:
         break
     else:
         print(f"the message is: {msg}")
+
+
 
 #lient.send(new_json.encode("utf-8"))
 
