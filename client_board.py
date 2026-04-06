@@ -5,8 +5,6 @@ from constants import DIMENSION
 
 #class BoardState()
 
-
-
 class Board:
 
     def __init__(self, window, config, camera):

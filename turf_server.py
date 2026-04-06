@@ -19,6 +19,7 @@ def run_client(addr, conn):
                 print("Client disconnected")
                 break
             print(f"the message is {msg}!")
+            conn.send(str.encode("default reply :|"))
         except socket.error as e:
             print(f"socket error: {e}")
             break
