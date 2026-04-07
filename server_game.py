@@ -1,12 +1,15 @@
 import pygame
-from client_board import Board, UI
+from server_board import Board
 from client_player import PlayerCamera
 class Game:
 
-    def __init__(self, window, config, NUM_OF_PLAYERS):
+    def __init__(self):
 
         self.players = []
         self.player_turn = 1
+        self.table = {
+
+        }
         self._init()
 
     def _init(self):
@@ -21,7 +24,9 @@ class Game:
             self.player_turn += 1
 
     def update(self):
-        self.board.draw_board()
+        # do something for board
+        pass
+
 '''
 class MoveCommand():
     def __init__(self):

@@ -1,4 +1,5 @@
 import pygame
+import json
 from client_board import Board, UI
 from client_player import PlayerCamera
 from tile import Button
@@ -15,8 +16,23 @@ class Game:
         self.camera = PlayerCamera(self.config)
         self.board = Board(self.window, self.config, self.camera)
         self.ui = UI()
+        self.table = {
+            "hello": self.say_hello
+        }
         #self.ui.buttons.append(Button(10, 10, self.change_turn()))
         #self.ui.draw_buttons(self.window)
+
+    def process_command(self, msg):
+        action_type = msg.get("action")
+        function = self.table.get(action_type)
+        if function:
+            function(msg)
+        else:
+            print("Unknown command received")
+
+    def say_hello(self, msg):
+        name = msg.get("name")
+        print(f"Hello {name}!")
 
     def get_button(self, x, y):
         self.ui.check_buttons(x, y)

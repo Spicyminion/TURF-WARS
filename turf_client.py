@@ -1,3 +1,5 @@
+import json
+
 import pygame
 import socket
 import threading
@@ -6,9 +8,28 @@ from turf_server import IP
 from client_game import Game
 from client_config import ConfigGame
 
+##########################
+# Initialize Game Object #
+##########################
+
+pygame.init()
+pygame.display.set_caption("TURF WARS")
+res = pygame.display.Info()
+config = ConfigGame(res.current_w, res.current_h)
+SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
+config.load_imgs()
+
+clock = pygame.time.Clock()
+FPS = 60
+NUM_OF_PLAYERS = 2
+
+game = Game(SCREEN, config, NUM_OF_PLAYERS)
+
+
 #####################
 # Initialize Client #
 #####################
+
 
 class Client:
     def __init__(self, ip):
@@ -30,6 +51,10 @@ class Client:
                     print("Connection closed")
                     break
                 print(f"new message: {data}")
+                if type(data) is json:
+                    msg = json.loads(data) # convert to python dict
+                    game.process_command(msg)
+
             except ConnectionResetError:
                 print("Server crashed")
                 break
@@ -43,30 +68,16 @@ class Client:
 person = Client(IP)
 
 
-#######################################
-# Load assets for the board rendering #
-#######################################
-
-pygame.init()
-pygame.display.set_caption("TURF WARS")
-res = pygame.display.Info()
-config = ConfigGame(res.current_w, res.current_h)
-SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
-config.load_imgs()
-
 ######################################################
 # Main loop for continuously checking for new inputs #
 ######################################################
 
-clock = pygame.time.Clock()
-FPS = 60
-NUM_OF_PLAYERS = 2
 
 def main():
 
     running = True
     SCREEN.fill((255, 255, 255))
-    game = Game(SCREEN, config, NUM_OF_PLAYERS)  # initialize game
+    #game = game_object  # initialize game
 
     while running:
 
