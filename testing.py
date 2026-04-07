@@ -13,11 +13,14 @@ json_string = '''
         ]
     }
 '''
+# ^^^ this format is sendable ^^^
+
 data = json.loads(json_string)  # converts to a python dictionary
 data['test'] = True
 
 new_json = json.dumps(data, indent=2, sort_keys=True) # convert python dict to json string (format)
-
+print(new_json['test'])
+exit()
 addr = ("192.168.1.95", 5555)  # Server IP, Port
 
 # First make a server

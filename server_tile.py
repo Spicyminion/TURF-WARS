@@ -13,11 +13,10 @@ class Tile:
         self.building = None
 
 class Building:
-    def __init__(self, col, row, config, type):
+    def __init__(self, col, row, type):
         self.row = row
         self.col = col
         self.type = type
-
 
 class Button:
     def __init__(self, x, y, command):

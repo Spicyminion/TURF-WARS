@@ -1,16 +1,17 @@
 import socket
 import json
 import threading
-from turf_game import Game
+from server_game import Game
 #import sys
 
 DESKTOP = "192.168.1.95" # desktop
 LAPTOP = "192.168.32.1" # laptop
 IP = DESKTOP # changes depending on where we're running the server from
 
-#game = Game()
+game = Game()
 
-def run_client(addr, conn):
+def run_client(addr, conn, player_num):
+    conn.send(json.dumps({"action": "hello", "name": "xub"}).encode())
     while True:
         # will wait on msg line till a new msg received
         try:
@@ -50,7 +51,7 @@ def boot_server(ip):
 
         # Send the client to a thread so it's constantly handled
 
-        threading.Thread(target=run_client, args=(addr,conn)).start()
+        threading.Thread(target=run_client, args=(addr,conn,player_num)).start()
 
         player_num+=1
 
