@@ -5,11 +5,13 @@ from client_player import PlayerCamera
 from tile import Button
 class Game:
 
-    def __init__(self, window, config, NUM_OF_PLAYERS):
+    def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
         self.window = window
         self.config = config
         self.players = []
         self.player_turn = 1
+        self.client = client
+        self.message_list = message_list
         self._init()
 
     def _init(self):
@@ -17,22 +19,37 @@ class Game:
         self.board = Board(self.window, self.config, self.camera)
         self.ui = UI()
         self.table = {
-            "hello": self.say_hello
+            "hello": self.say_hello,
+            "message": self.print_message
         }
+
         #self.ui.buttons.append(Button(10, 10, self.change_turn()))
         #self.ui.draw_buttons(self.window)
 
-    def process_command(self, msg):
-        action_type = msg.get("action")
+    def test_send(self):
+        self.client.send("HELLO SERVER")
+
+    def process_queue(self):
+        while not self.message_list.empty():
+            msg = self.message_list.get()
+            print(f"message from queue: {msg}")
+            self.process_command(msg)
+
+    def process_command(self, new_msg):
+        action_type = new_msg.get("action")
         function = self.table.get(action_type)
         if function:
-            function(msg)
+            function(new_msg)
         else:
             print("Unknown command received")
 
-    def say_hello(self, msg):
-        name = msg.get("name")
+    def say_hello(self, new_msg):
+        name = new_msg.get("name")
         print(f"Hello {name}!")
+
+    def print_message(self, new_msg):
+        message = new_msg.get("text")
+        print(f"message from server: {message}")
 
     def get_button(self, x, y):
         self.ui.check_buttons(x, y)
@@ -91,6 +108,7 @@ class Game:
         self.board.draw_board()
 
     def update(self):
+        self.process_queue()
         self.board.draw_board()
 '''
 class MoveCommand():
