@@ -3,14 +3,19 @@ import json
 import pygame
 import socket
 import threading
+import queue
 from turf_network import Network
 from turf_server import IP
 from client_game import Game
 from client_config import ConfigGame
 
+
 ##########################
 # Initialize Game Object #
 ##########################
+
+
+message_list = queue.Queue() # this will keep track of messages for the client to pass to game obj
 
 pygame.init()
 pygame.display.set_caption("TURF WARS")
@@ -23,8 +28,7 @@ clock = pygame.time.Clock()
 FPS = 60
 NUM_OF_PLAYERS = 2
 
-game = Game(SCREEN, config, NUM_OF_PLAYERS)
-
+#game = Game(SCREEN, config, NUM_OF_PLAYERS)
 
 #####################
 # Initialize Client #
@@ -51,9 +55,9 @@ class Client:
                     print("Connection closed")
                     break
                 print(f"new message: {data}")
-                if type(data) is json:
-                    msg = json.loads(data) # convert to python dict
-                    game.process_command(msg)
+                msg = json.loads(data) # convert to python dict
+                message_list.put(msg)
+                #game.process_command(msg)
 
             except ConnectionResetError:
                 print("Server crashed")
@@ -64,9 +68,9 @@ class Client:
         self.client.send(str.encode(action))
 
 
-
 person = Client(IP)
 
+game = Game(SCREEN, config, person, message_list, NUM_OF_PLAYERS)
 
 ######################################################
 # Main loop for continuously checking for new inputs #
@@ -103,7 +107,6 @@ def main():
                 if event.key == pygame.K_z:
                     game.zoom(1)
                     print("zooming in")
-                    person.send("ZOOM")  # Test to see if server receives message
                 elif event.key == pygame.K_x:
                     game.zoom(-1)
                     print("zooming out")
@@ -112,7 +115,10 @@ def main():
                 elif event.key == pygame.K_r:
                     game.rotate(1)
                 elif event.key == pygame.K_c:
-                     game.center_board()
+                    game.center_board()
+                elif event.key == pygame.K_p:
+                    print("press p")
+                    game.test_send()
 
             '''         
             else:

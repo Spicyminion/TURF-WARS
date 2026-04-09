@@ -1,6 +1,7 @@
 import socket
 import json
 import threading
+import queue
 from server_game import Game
 #import sys
 
@@ -8,10 +9,15 @@ DESKTOP = "192.168.1.95" # desktop
 LAPTOP = "192.168.32.1" # laptop
 IP = DESKTOP # changes depending on where we're running the server from
 
+requests = queue.Queue()
+
 game = Game()
 
 def run_client(addr, conn, player_num):
-    conn.send(json.dumps({"action": "hello", "name": "xub"}).encode())
+    game.clients.append(conn)
+    conn.send(json.dumps({"action": "message", "text": "xub"}).encode())
+    game.clients[player_num-1].send(json.dumps({"action": "message", "text": f"player_{player_num}"}).encode())
+    #conn.send(json.dumps({"action": "player_id", "id": "1"}).encode())
     while True:
         # will wait on msg line till a new msg received
         try:
@@ -20,7 +26,8 @@ def run_client(addr, conn, player_num):
                 print("Client disconnected")
                 break
             print(f"the message is {msg}!")
-            conn.send(str.encode("default reply :|"))
+            requests.put(msg)
+            #conn.send(str.encode("default reply :|"))
         except socket.error as e:
             print(f"socket error: {e}")
             break
@@ -48,7 +55,7 @@ def boot_server(ip):
     while True:
         conn, addr = s.accept() # will wait here till we get a new client
         print(f"Connection Accepted: {conn} {addr}")
-
+        game.players.append(player_num)
         # Send the client to a thread so it's constantly handled
 
         threading.Thread(target=run_client, args=(addr,conn,player_num)).start()

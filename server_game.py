@@ -5,17 +5,17 @@ class Game:
 
     def __init__(self):
 
-        self.players = []
+        self.clients = []
+        self.players = [0]
         self.player_turn = 1
         self.table = {
-
+            "change_turn": self.change_turn
         }
+        self.msg = None
         self._init()
 
     def _init(self):
         self.board = Board()
-        #self.ui.buttons.append(Button(10, 10, self.change_turn()))
-        #self.ui.draw_buttons(self.window)
 
     def change_turn(self):
         if self.player_turn == len(self.players):
