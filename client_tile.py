@@ -37,8 +37,8 @@ class Building:
         self.tile_width = tile_width
         self.tile_height = tile_height
         self.w, self.h = self.img.get_size()
-        self.x = tile_x - (self.w/2)
-        self.y = tile_y - (self.h/2)
+        self.x = tile_x + (self.w/2)  # tile x,y is the center of the tile
+        self.y = tile_y + (self.h/2)
         self.draw_x = tile_x + self.tile_width - (self.w / 2)
         self.draw_y = tile_y + self.tile_height - (self.h / 2)
 

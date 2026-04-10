@@ -1,8 +1,4 @@
-from cgi import print_form
-
 import pygame
-from pygame.examples.scroll import zoom_factor
-
 from layout import layout, TileType
 from constants import DIMENSION, HALF_HEIGHT
 
@@ -45,6 +41,8 @@ class PlayerCamera:
         self.rotation_offset = 0
         self.zoom_level = 1.0
         self.move_camera()
+        self.OFFSET_X = self.config.INITIAL_OFFSET_X
+        self.OFFSET_Y = self.config.INITIAL_OFFSET_Y
 
     def rotate_point_cw(self, x, y, cx, cy, turns, half_width, half_height):
         """
@@ -110,17 +108,19 @@ class PlayerCamera:
         center_y = self.config.screen_height / 2
 
         # Top-left -> image center
-        zx = screen_x #+ self.config.HALF_WIDTH
-        zy = screen_y #+ self.config.HALF_HEIGHT
+        zx = screen_x + self.config.HALF_WIDTH
+        zy = screen_y + self.config.HALF_HEIGHT
 
         # Undo zoom
         tx = center_x + ((zx - center_x) / self.zoom_level)
         ty = center_y + ((zy - center_y) / self.zoom_level)
         print(f"TX, TY: {tx}, {ty}")
+
         # Undo translation (pan)
         rx = tx - self.x_offset
         ry = ty - self.y_offset
         print(f"NON ROT {rx}, {ry}")
+
         # Undo rotation (rotate CCW)
         gx, gy = self.rotate_point_cw(
             rx, ry,
@@ -135,15 +135,3 @@ class PlayerCamera:
         print(f"FINAL: {gx}, {gy}")
         print(f"CENT: {cx}, {cy}")
         return gx, gy
-
-
-
-
-
-
-
-
-
-
-
-

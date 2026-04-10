@@ -1,5 +1,4 @@
 import json
-
 import pygame
 import socket
 import threading
@@ -13,7 +12,6 @@ from client_config import ConfigGame
 ##########################
 # Initialize Game Object #
 ##########################
-
 
 message_list = queue.Queue() # this will keep track of messages for the client to pass to game obj
 
@@ -44,7 +42,7 @@ class Client:
     def connect_to_server(self, ip):
         print("Connecting to server")
         self.client.connect((ip, 5555))
-        self.client.send(str.encode("hello"))
+        #self.client.send(str.encode("hello"))
         threading.Thread(target=self.maintain_conn).start()
 
     def maintain_conn(self):
@@ -68,14 +66,13 @@ class Client:
         self.client.send(str.encode(action))
 
 
-person = Client(IP)
+client = Client(IP)
 
-game = Game(SCREEN, config, person, message_list, NUM_OF_PLAYERS)
+game = Game(SCREEN, config, client, message_list, NUM_OF_PLAYERS)
 
 ######################################################
 # Main loop for continuously checking for new inputs #
 ######################################################
-
 
 def main():
 
@@ -111,14 +108,13 @@ def main():
                     game.zoom(-1)
                     print("zooming out")
                 elif event.key == pygame.K_t:
+                    print("requesting to change turn ")
                     game.change_turn()
                 elif event.key == pygame.K_r:
                     game.rotate(1)
                 elif event.key == pygame.K_c:
                     game.center_board()
-                elif event.key == pygame.K_p:
-                    print("press p")
-                    game.test_send()
+
 
             '''         
             else:

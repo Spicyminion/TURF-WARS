@@ -37,7 +37,7 @@ class Board:
             mask = pygame.mask.from_threshold(img, (0, 0, 0), (1, 1, 1, 255))
             mask.invert()
             self.img_masks[name] = mask
-        self.update_imgs()
+        #self.update_imgs()
 
     def define_grid(self):
         id = 0
@@ -101,6 +101,7 @@ class Board:
     def game_to_tile(self, x, y):
         pass
 
+    """"
     def check_mask(self, click_x, click_y, img_x, img_y, img_type):
         print(f"click_x {click_x} click_y {click_y}")
         print(f"img_x {img_x} img_y {img_y}")
@@ -120,17 +121,17 @@ class Board:
             return mask.get_at(
                 (round(check_x), round(check_y)))  # check if the click is within the boundaries of the image
 
-
+    
     def check_click(self, screen_x, screen_y):
 
-        # Undo all camera transforms → game space
+        # Undo all camera transforms -> game space
         gx, gy = self.camera.camera_to_game(screen_x, screen_y)
 
-        # 2) Translate into tile-local coordinates (0,0 = top-left of top-left tile)
+        # Translate into tile-local coordinates (0,0 = top-left of top-left tile)
         cx = gx - self.config.INITIAL_OFFSET_X - self.config.HALF_WIDTH
         cy = gy - self.config.INITIAL_OFFSET_Y
 
-        # Normalize by tile dimensions (diamond width/height)
+        # Normalize by tile dimensions (tile width/height)
         nx = cx / self.HALF_WIDTH
         ny = cy / self.HALF_HEIGHT
 
@@ -148,23 +149,82 @@ class Board:
         print(col, row)
 
         # Check mask
-        tile_x = tile.x - self.HALF_WIDTH
+        tile_x = tile.x - self.HALF_WIDTH  # tile.x,y are the center coord of the tile
         tile_y = tile.y - self.HALF_HEIGHT
+        print(f"tile_x: {tile_x} tile_y: {tile_y}")
         check = self.check_mask(gx, gy, tile_x, tile_y, 'grass_block')
 
         if check:
             print(col, row, check)
             if tile.building:
+                print("### CHECKING BUILDING ###")
                 building = tile.building
-                build_x, build_y = self.building_coords(tile_x, tile_y, self.local_imgs['apartment'])
+                build_x = tile.x - (building.w/2)
+                build_y = tile.y - (building.h/2)
                 check = self.check_mask(gx, gy, build_x, build_y, 'apartment')
                 if check:
                     print("building clicked!")
         else:
             print(col, row, check)
             return None
+    """
 
+    def check_mask(self, click_x, click_y, img_x, img_y, img_type):
+        mask = self.img_masks[img_type]
+        image = self.local_imgs[img_type]
 
+        rect = image.get_rect(topleft=(img_x, img_y))
+        if not rect.collidepoint(click_x, click_y):
+            return False
+        elif click_x - img_x < 0 or click_y - img_y < 0:
+            return False
+        else:
+            check_x, check_y = (click_x - img_x, click_y - img_y)
+            return mask.get_at((round(check_x), round(check_y)))
+
+    def check_click(self, screen_x, screen_y):
+        rotation = self.camera.rotation_offset
+
+        # Loop in REVERSE draw order (front-to-back visually).
+        # This ensures if a building overlaps a tile behind it, you click the building.
+        for column in reversed(range(len(layout))):
+            for row in reversed(range(len(layout[column]))):
+
+                # Apply your existing visual rotation swap
+                if rotation == 1:
+                    column_rot = row
+                    row_rot = DIMENSION - 1 - column
+                elif rotation == 2:
+                    column_rot = DIMENSION - 1 - column
+                    row_rot = DIMENSION - 1 - row
+                elif rotation == 3:
+                    column_rot = DIMENSION - 1 - row
+                    row_rot = column
+                else:
+                    column_rot = column
+                    row_rot = row
+
+                tile = self.tiles[column_rot][row_rot]
+
+                # Check where tile is on the screen
+                tile_screen_x, tile_screen_y = self.camera.game_to_camera(tile.x, tile.y)
+
+                # Check the building first
+                if tile.building:
+                    build_screen_x, build_screen_y = self.building_coords(
+                        tile_screen_x, tile_screen_y, self.local_imgs['apartment']
+                    )
+
+                    if self.check_mask(screen_x, screen_y, build_screen_x, build_screen_y, 'apartment'):
+                        print(f"Building clicked on logical tile: {column_rot}, {row_rot}")
+                        return tile
+
+                # Then check the ground tile mask
+                if self.check_mask(screen_x, screen_y, tile_screen_x, tile_screen_y, tile.img_key):
+                    print(f"Tile clicked logically at: {column_rot}, {row_rot}")
+                    return tile
+
+        return None
 
 class UI:
     def __init__(self):

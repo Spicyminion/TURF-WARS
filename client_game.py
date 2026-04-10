@@ -8,10 +8,11 @@ class Game:
     def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
         self.window = window
         self.config = config
-        self.players = []
+        self.player_id = None
         self.player_turn = 1
         self.client = client
         self.message_list = message_list
+        self.new_msg = None
         self._init()
 
     def _init(self):
@@ -20,7 +21,9 @@ class Game:
         self.ui = UI()
         self.table = {
             "hello": self.say_hello,
-            "message": self.print_message
+            "message": self.print_message,
+            "player_id": self.assign_id,
+            "update_turn": self.update_turn
         }
 
         #self.ui.buttons.append(Button(10, 10, self.change_turn()))
@@ -35,21 +38,35 @@ class Game:
             print(f"message from queue: {msg}")
             self.process_command(msg)
 
-    def process_command(self, new_msg):
-        action_type = new_msg.get("action")
+    def process_command(self, msg):
+        action_type = msg.get("action")
         function = self.table.get(action_type)
         if function:
-            function(new_msg)
+            self.new_msg = msg
+            function()
         else:
             print("Unknown command received")
 
-    def say_hello(self, new_msg):
-        name = new_msg.get("name")
+    def assign_id(self):
+        self.player_id = self.new_msg.get("id")
+
+    def update_turn(self):
+        msg = self.new_msg.get("turn")
+        self.player_turn = msg
+
+    def say_hello(self):
+        name = self.new_msg.get("name")
         print(f"Hello {name}!")
 
-    def print_message(self, new_msg):
-        message = new_msg.get("text")
+    def print_message(self):
+        message = self.new_msg.get("text")
         print(f"message from server: {message}")
+
+    def change_turn(self):
+        print(f"player_id: {self.player_id} player turn: {self.player_turn}")
+        if int(self.player_id) == int(self.player_turn):
+            msg = {"action": "change_turn", "id": f"{self.player_id}"}
+            self.client.client.send(json.dumps(msg).encode())
 
     def get_button(self, x, y):
         self.ui.check_buttons(x, y)
@@ -70,7 +87,7 @@ class Game:
             self.camera.zoom_level+=zoom
             self.camera.move_camera()
             self.board.update_imgs()
-            #self.board.update_masks()
+            self.board.update_masks()
             self.board.draw_board()
 
     def move_y(self, increment):
@@ -93,16 +110,11 @@ class Game:
             self.camera.rotation_offset += direction
         self.board.update_imgs()
 
-    def change_turn(self):
-        if self.player_turn == len(self.players):
-            self.player_turn = 1
-        else:
-            self.player_turn += 1
-
     def center_board(self):
         self.camera.center_board()
+        self.board.update_imgs()
         self.board.update_masks()
-        #self.board.draw_board()
+        self.board.draw_board()
 
     def draw_board(self):
         self.board.draw_board()

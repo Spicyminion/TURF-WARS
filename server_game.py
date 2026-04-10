@@ -1,9 +1,10 @@
 import pygame
 from server_board import Board
-from client_player import PlayerCamera
+import json
+import queue
 class Game:
 
-    def __init__(self):
+    def __init__(self, message_list):
 
         self.clients = []
         self.players = [0]
@@ -11,21 +12,47 @@ class Game:
         self.table = {
             "change_turn": self.change_turn
         }
-        self.msg = None
+        self.message_list = message_list
+        self.new_msg = None
         self._init()
 
     def _init(self):
         self.board = Board()
 
-    def change_turn(self):
-        if self.player_turn == len(self.players):
-            self.player_turn = 1
+    def process_queue(self):
+            msg = self.message_list.get() # will stop here until a new message
+            print(f"message from queue: {msg}")
+            msg = json.loads(msg) # convert to dict
+            self.process_command(msg)
+
+    def process_command(self, msg):
+        action_type = msg.get("action")
+        function = self.table.get(action_type)
+        if function:
+            self.new_msg = msg
+            function()
         else:
-            self.player_turn += 1
+            print("Unknown command received")
+
+    def change_turn(self):
+        player_id = self.new_msg.get("id")
+        if player_id == self.player_turn:
+            if self.player_turn == len(self.players):
+                self.player_turn = 1
+            else:
+                self.player_turn += 1
+            for client in self.clients:
+                turn = {"action": "update_turn", "turn": f"{self.player_turn}"}
+                client.send(json.dumps(turn).encode())
+
+
+    def say_hello(self):
+        name = self.new_msg.get("name")
+        print(f"Hello {name}!")
 
     def update(self):
-        # do something for board
         pass
+        # do something for board
 
 '''
 class MoveCommand():
