@@ -13,21 +13,16 @@ class Tile:
         self.building = None
 
 class Building:
-    def __init__(self, col, row, type):
+    def __init__(self, col, row, type, id):
         self.row = row
         self.col = col
         self.type = type
+        self.id = id
 
-class Button:
-    def __init__(self, x, y, command):
-        self.x = x
-        self.y = y
-        self.command = command
-
-    def get_rect(self):
-        return self.x, self.y
-
-    def on_click(self):
-        self.command.execute()
+class Character:
+    def __init__(self, col, row, health):
+        self.row = row
+        self.col = col
+        self.health = health
 
 

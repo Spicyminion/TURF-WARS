@@ -13,6 +13,7 @@ class Game:
         self.client = client
         self.message_list = message_list
         self.new_msg = None
+        self.state = "BOARD"
         self._init()
 
     def _init(self):
@@ -23,11 +24,32 @@ class Game:
             "hello": self.say_hello,
             "message": self.print_message,
             "player_id": self.assign_id,
-            "update_turn": self.update_turn
+            "update_turn": self.update_turn,
+            "add_object": self.add_object
         }
 
         #self.ui.buttons.append(Button(10, 10, self.change_turn()))
         #self.ui.draw_buttons(self.window)
+
+    def check_key_pressed(self, key_press):
+        if self.state == "BOARD":
+            if key_press == pygame.K_z:
+                game.zoom(1)
+                print("zooming in")
+            elif event.key == pygame.K_x:
+                game.zoom(-1)
+                print("zooming out")
+            elif event.key == pygame.K_t:
+                print("requesting to change turn ")
+                game.change_turn()
+            elif event.key == pygame.K_a:
+                print("requesting to add object")
+                game.request_add_object()
+            elif event.key == pygame.K_r:
+                game.rotate(1)
+            elif event.key == pygame.K_c:
+                game.center_board()
+
 
     def test_send(self):
         self.client.send("HELLO SERVER")
@@ -49,10 +71,21 @@ class Game:
 
     def assign_id(self):
         self.player_id = self.new_msg.get("id")
+        self.board.player_id = self.player_id
 
     def update_turn(self):
         msg = self.new_msg.get("turn")
         self.player_turn = msg
+        self.board.player_turn = self.player_turn
+
+    def request_add_object(self):
+        msg = json.dumps({"action": "add_object", "col": "3", "row": "3", "id": f"{self.player_id}"}).encode()
+        self.client.client.send(msg)
+
+    def add_object(self):
+        row = self.new_msg.get("row")
+        col = self.new_msg.get("col")
+        self.board.add_object(col, row)
 
     def say_hello(self):
         name = self.new_msg.get("name")
@@ -72,7 +105,7 @@ class Game:
         self.ui.check_buttons(x, y)
 
     def check_pos(self, x, y, ):
-        self.board.check_click(x, y)
+        self.board.check_click(x, y, self.player_turn)
 
     def check_all(self, d1, d2, x, y ):
         for build in self.board.tiles[d1][d2].building:

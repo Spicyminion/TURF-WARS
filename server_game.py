@@ -9,11 +9,12 @@ class Game:
         self.clients = []
         self.players = [0]
         self.player_turn = 1
-        self.table = {
-            "change_turn": self.change_turn
-        }
         self.message_list = message_list
         self.new_msg = None
+        self.table = {
+            "change_turn": self.change_turn,
+            "add_object": self.add_object
+        }
         self._init()
 
     def _init(self):
@@ -36,15 +37,25 @@ class Game:
 
     def change_turn(self):
         player_id = self.new_msg.get("id")
-        if player_id == self.player_turn:
-            if self.player_turn == len(self.players):
+        if int(player_id) == int(self.player_turn):
+            if int(self.player_turn) == len(self.clients):
                 self.player_turn = 1
             else:
                 self.player_turn += 1
             for client in self.clients:
+                print("send turn update")
                 turn = {"action": "update_turn", "turn": f"{self.player_turn}"}
                 client.send(json.dumps(turn).encode())
 
+    def add_object(self):
+        print("passing object to clients")
+        col = self.new_msg.get("col")
+        row = self.new_msg.get("row")
+        player_id = self.new_msg.get("id")
+        msg = {"action": "add_object", "col": f"{col}", "row": f"{row}", "id": f"{player_id}"}
+        self.board.add_objects(msg)
+        for client in self.clients:
+            client.send(json.dumps(msg).encode())
 
     def say_hello(self):
         name = self.new_msg.get("name")

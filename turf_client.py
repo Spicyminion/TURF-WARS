@@ -16,7 +16,6 @@ from client_config import ConfigGame
 message_list = queue.Queue() # this will keep track of messages for the client to pass to game obj
 
 pygame.init()
-pygame.display.set_caption("TURF WARS")
 res = pygame.display.Info()
 config = ConfigGame(res.current_w, res.current_h)
 SCREEN = pygame.display.set_mode((config.screen_width, config.screen_height))
@@ -55,7 +54,6 @@ class Client:
                 print(f"new message: {data}")
                 msg = json.loads(data) # convert to python dict
                 message_list.put(msg)
-                #game.process_command(msg)
 
             except ConnectionResetError:
                 print("Server crashed")
@@ -63,12 +61,14 @@ class Client:
 
     def send(self, action):
         print("sending action")
-        self.client.send(str.encode(action))
+        self.client.send(action)
 
 
 client = Client(IP)
 
 game = Game(SCREEN, config, client, message_list, NUM_OF_PLAYERS)
+pygame.display.set_caption(f"TURF WARS {game.player_id}")
+
 
 ######################################################
 # Main loop for continuously checking for new inputs #
@@ -101,6 +101,8 @@ def main():
                     pass
 
             elif event.type == pygame.KEYDOWN:
+                key_press = pygame.key.get_pressed()
+
                 if event.key == pygame.K_z:
                     game.zoom(1)
                     print("zooming in")
@@ -110,6 +112,9 @@ def main():
                 elif event.key == pygame.K_t:
                     print("requesting to change turn ")
                     game.change_turn()
+                elif event.key == pygame.K_a:
+                    print("requesting to add object")
+                    game.request_add_object()
                 elif event.key == pygame.K_r:
                     game.rotate(1)
                 elif event.key == pygame.K_c:

@@ -19,7 +19,10 @@ class Board:
         self.camera = camera
         self.board_center = (self.config.screen_width / 2) + (self.config.screen_height / 2) # start at true center of board
         self.tiles = []
+        self.buttons = []
         self.define_grid()
+        self.id = None
+        self.player_turn = 1
         for name,img in self.config.assets.imgs.items():
             self.local_imgs[name] = img
         self.update_masks()
@@ -40,7 +43,6 @@ class Board:
         #self.update_imgs()
 
     def define_grid(self):
-        id = 0
         for column in range(len(layout)):
             self.tiles.append([])
             for row in range(len(layout[column])):
@@ -58,16 +60,20 @@ class Board:
                 #if column == 0 and row == 0:
                 #    print(f"ORIG TILE_X{x} ORIG TILE_Y{y}")
                 self.tiles[column].append(Tile(tile_type, column, row, x + self.HALF_WIDTH, y + self.HALF_HEIGHT)) # true center
-                id += 1
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
-                    tile.building = Building(column, row, self.config, BuildType.APARTMENT, x, y, self.HALF_WIDTH, self.HALF_HEIGHT)
+                    tile.building = Building(column, row, self.config, BuildType.APARTMENT, 1, x, y, self.HALF_WIDTH, self.HALF_HEIGHT)
 
     def building_coords(self, x, y, img):
         w, h = img.get_size()
         x_build = x - (w/2) + self.HALF_WIDTH * self.camera.zoom_level
         y_build = y - (h/2) + self.HALF_HEIGHT * self.camera.zoom_level
         return x_build, y_build
+
+    def add_object(self, col, row):
+        tile = self.tiles[int(col)][int(row)]
+        x, y = tile.x, tile.y
+        tile.building = Building(col, row, self.config, BuildType.APARTMENT, 1, x, y, self.HALF_WIDTH, self.HALF_HEIGHT)
 
     def character_coords(self, x, y, img):
         pass
@@ -101,6 +107,7 @@ class Board:
     def game_to_tile(self, x, y):
         pass
 
+    # DEFUNCT MASK AND CLICK CHECKS
     """"
     def check_mask(self, click_x, click_y, img_x, img_y, img_type):
         print(f"click_x {click_x} click_y {click_y}")
@@ -170,6 +177,7 @@ class Board:
     """
 
     def check_mask(self, click_x, click_y, img_x, img_y, img_type):
+
         mask = self.img_masks[img_type]
         image = self.local_imgs[img_type]
 
@@ -182,9 +190,8 @@ class Board:
             check_x, check_y = (click_x - img_x, click_y - img_y)
             return mask.get_at((round(check_x), round(check_y)))
 
-    def check_click(self, screen_x, screen_y):
+    def check_click(self, screen_x, screen_y, turn):
         rotation = self.camera.rotation_offset
-
         # Loop in REVERSE draw order (front-to-back visually).
         # This ensures if a building overlaps a tile behind it, you click the building.
         for column in reversed(range(len(layout))):
@@ -211,13 +218,16 @@ class Board:
 
                 # Check the building first
                 if tile.building:
-                    build_screen_x, build_screen_y = self.building_coords(
-                        tile_screen_x, tile_screen_y, self.local_imgs['apartment']
-                    )
-
-                    if self.check_mask(screen_x, screen_y, build_screen_x, build_screen_y, 'apartment'):
-                        print(f"Building clicked on logical tile: {column_rot}, {row_rot}")
-                        return tile
+                    print(f"BUILDING ID: {tile.building.id} PLAYER TURN: {self.player_turn}")
+                    if int(tile.building.id) == int(self.player_turn):
+                        build_screen_x, build_screen_y = self.building_coords(
+                            tile_screen_x, tile_screen_y, self.local_imgs['apartment']
+                        )
+                        if self.check_mask(screen_x, screen_y, build_screen_x, build_screen_y, 'apartment'):
+                            print(f"Building clicked on logical tile: {column_rot}, {row_rot}")
+                            return tile
+                    else:
+                        print("not your turn to interact with object")
 
                 # Then check the ground tile mask
                 if self.check_mask(screen_x, screen_y, tile_screen_x, tile_screen_y, tile.img_key):

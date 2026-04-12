@@ -1,6 +1,6 @@
 import pygame
 from layout import layout, TileType, BuildType
-from server_tile import Tile, Building, Button
+from server_tile import Tile, Building
 from constants import DIMENSION
 
 #class BoardState()
@@ -12,7 +12,6 @@ class Board:
         self.define_grid()
 
     def define_grid(self):
-        id = 0
         for column in range(len(layout)):
             self.tiles.append([])
             for row in range(len(layout[column])):
@@ -20,10 +19,14 @@ class Board:
                 #if column == 0 and row == 0:
                 #    print(f"ORIG TILE_X{x} ORIG TILE_Y{y}")
                 self.tiles[column].append(Tile(tile_type, column, row)) # true center
-                id += 1
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
-                    tile.building = Building(column, row, BuildType.APARTMENT)
+                    tile.building = Building(column, row, BuildType.APARTMENT, 1)
+
+    def add_objects(self, msg):
+        col, row, player_id = int(msg["col"]), int(msg["row"]), int(msg["id"])
+        tile = self.tiles[col][row]
+        tile.building = Building(col, row, BuildType.APARTMENT, player_id)
 
     def game_to_tile(self, x, y):
         pass

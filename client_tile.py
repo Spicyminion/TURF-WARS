@@ -13,6 +13,7 @@ class Tile:
         self.y = y
         self.characters = []
         self.building = None
+        self.id = None
 
     def check_click(self, click_x, click_y):
         check = True
@@ -27,7 +28,7 @@ class Tile:
                     break
 
 class Building:
-    def __init__(self, col, row, config, type,
+    def __init__(self, col, row, config, type, id,
                  tile_x, tile_y, tile_width, tile_height):
         self.row = row
         self.col = col
@@ -41,19 +42,14 @@ class Building:
         self.y = tile_y + (self.h/2)
         self.draw_x = tile_x + self.tile_width - (self.w / 2)
         self.draw_y = tile_y + self.tile_height - (self.h / 2)
+        self.id = id
 
     def draw_coords(self, x, y):
         draw_x = x - self.w/2
         draw_y = y - self.h/2
         return draw_x, draw_y
-    ''' 
-    def draw_building(self, window, tile_height, tile_width, tile_x, tile_y):
-        draw_x, draw_y = self.get_coord(tile_x, tile_y, tile_width, tile_height)
-        window.blit(self.img, (draw_x, draw_y))
 
-    def check_click(self, tile_height, tile_width, tile_x, tile_y):  # workaround for coordinate logic
-        build_x, build_y = self.get_coord(tile_x, tile_y, tile_width, tile_height, tile_width)
-
+    '''
     def draw_stat(self, window, x, y):
         test = self.config.assets.get('test_stat')
         w, h = self.rect.w, self.rect.h
@@ -62,17 +58,35 @@ class Building:
     '''
 
 
-
 class Button:
-    def __init__(self, x, y, command):
+    def __init__(self, x, y, command, img_key):
         self.x = x
         self.y = y
         self.command = command
+
+    '''
+    def check_mask(self, click_x, click_y, img_x, img_y, img_type):
+
+        mask = self.img_masks[img_type]
+        image = self.local_imgs[img_type]
+
+        rect = image.get_rect(topleft=(img_x, img_y))
+        if not rect.collidepoint(click_x, click_y):
+            return False
+        elif click_x - img_x < 0 or click_y - img_y < 0:
+            return False
+        else:
+            check_x, check_y = (click_x - img_x, click_y - img_y)
+            return mask.get_at((round(check_x), round(check_y)))
+    '''
 
     def get_rect(self):
         return self.x, self.y
 
     def on_click(self):
         self.command.execute()
+
+
+
 
 
