@@ -101,24 +101,8 @@ def main():
                     pass
 
             elif event.type == pygame.KEYDOWN:
-                key_press = pygame.key.get_pressed()
-
-                if event.key == pygame.K_z:
-                    game.zoom(1)
-                    print("zooming in")
-                elif event.key == pygame.K_x:
-                    game.zoom(-1)
-                    print("zooming out")
-                elif event.key == pygame.K_t:
-                    print("requesting to change turn ")
-                    game.change_turn()
-                elif event.key == pygame.K_a:
-                    print("requesting to add object")
-                    game.request_add_object()
-                elif event.key == pygame.K_r:
-                    game.rotate(1)
-                elif event.key == pygame.K_c:
-                    game.center_board()
+                print("### KEY DOWN ###")
+                game.check_key_pressed(event.key)
 
 
             '''         

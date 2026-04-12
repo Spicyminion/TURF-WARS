@@ -2,7 +2,7 @@ import pygame
 import json
 from client_board import Board, UI
 from client_player import PlayerCamera
-from tile import Button
+from client_tile import Button
 class Game:
 
     def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
@@ -13,13 +13,13 @@ class Game:
         self.client = client
         self.message_list = message_list
         self.new_msg = None
+        self.buttons = []
         self.state = "BOARD"
         self._init()
 
     def _init(self):
         self.camera = PlayerCamera(self.config)
         self.board = Board(self.window, self.config, self.camera)
-        self.ui = UI()
         self.table = {
             "hello": self.say_hello,
             "message": self.print_message,
@@ -28,28 +28,30 @@ class Game:
             "add_object": self.add_object
         }
 
-        #self.ui.buttons.append(Button(10, 10, self.change_turn()))
-        #self.ui.draw_buttons(self.window)
+        self.buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
             if key_press == pygame.K_z:
-                game.zoom(1)
+                self.zoom(1)
                 print("zooming in")
-            elif event.key == pygame.K_x:
-                game.zoom(-1)
+            elif key_press == pygame.K_x:
+                self.zoom(-1)
                 print("zooming out")
-            elif event.key == pygame.K_t:
+            elif key_press == pygame.K_t:
                 print("requesting to change turn ")
-                game.change_turn()
-            elif event.key == pygame.K_a:
+                self.change_turn()
+            elif key_press == pygame.K_a:
                 print("requesting to add object")
-                game.request_add_object()
-            elif event.key == pygame.K_r:
-                game.rotate(1)
-            elif event.key == pygame.K_c:
-                game.center_board()
+                self.request_add_object()
+            elif key_press == pygame.K_r:
+                self.rotate(1)
+            elif key_press == pygame.K_c:
+                self.center_board()
 
+    def check_buttons(self, x, y):
+        for button in self.buttons:
+            button.check_mask(x, y)
 
     def test_send(self):
         self.client.send("HELLO SERVER")
@@ -101,10 +103,9 @@ class Game:
             msg = {"action": "change_turn", "id": f"{self.player_id}"}
             self.client.client.send(json.dumps(msg).encode())
 
-    def get_button(self, x, y):
-        self.ui.check_buttons(x, y)
-
     def check_pos(self, x, y, ):
+        print(f"x: {x}, y: {y}")
+        self.check_buttons(x, y)
         self.board.check_click(x, y, self.player_turn)
 
     def check_all(self, d1, d2, x, y ):
@@ -149,12 +150,16 @@ class Game:
         self.board.update_masks()
         self.board.draw_board()
 
+
     def draw_board(self):
-        self.board.draw_board()
+        pass
 
     def update(self):
         self.process_queue()
+        for button in self.buttons:
+            self.window.blit(button.img, (button.x, button.y))
         self.board.draw_board()
+
 '''
 class MoveCommand():
     def __init__(self):
