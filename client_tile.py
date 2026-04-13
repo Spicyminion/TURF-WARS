@@ -58,54 +58,6 @@ class Building:
     '''
 
 
-class Button:
-    def __init__(self, x, y, command, img):
-        self.x = x
-        self.y = y
-        self.img = img
-        self.mask = None
-        self.command = command
-        self.make_mask()
-
-    def make_mask(self):
-        self.mask = pygame.mask.from_threshold(self.img, (0, 0, 0), (1, 1, 1, 255))
-        self.mask.invert()
-
-    def check_mask(self, click_x, click_y):
-        rect = self.img.get_rect(topleft=(self.x, self.y))
-        if not rect.collidepoint(click_x, click_y):
-            print("not clicked")
-        elif click_x - self.x < 0 or click_y - self.y < 0:
-            print("not clicked")
-        else:
-            check_x, check_y = (click_x - self.x, click_y - self.y)
-            if self.mask.get_at((round(check_x), round(check_y))):
-                print("BUTTON PRESSED")
-                self.command()
-
-
-
-    '''
-    def check_mask(self, click_x, click_y, img_x, img_y, img_type):
-
-        mask = self.img_masks[img_type]
-        image = self.local_imgs[img_type]
-
-        rect = image.get_rect(topleft=(img_x, img_y))
-        if not rect.collidepoint(click_x, click_y):
-            return False
-        elif click_x - img_x < 0 or click_y - img_y < 0:
-            return False
-        else:
-            check_x, check_y = (click_x - img_x, click_y - img_y)
-            return mask.get_at((round(check_x), round(check_y)))
-    '''
-
-    def get_rect(self):
-        return self.x, self.y
-
-    def on_click(self):
-        self.command.execute()
 
 
 

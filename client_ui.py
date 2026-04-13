@@ -1,0 +1,59 @@
+import pygame
+
+class UI:
+    def __init__(self, window):
+        self.window = window
+        self.start_buttons = []
+        self.board_buttons = []
+        self.shop_buttons = []
+        self.state = "BOARD"
+
+    def draw(self):
+        if self.state == "START":
+            for button in self.start_buttons:
+                self.window.blit(button.img, (button.x, button.y))
+        elif self.state == "BOARD":
+            for button in self.board_buttons:
+                self.window.blit(button.img, (button.x, button.y))
+        elif self.state == "SHOP":
+            for button in self.shop_buttons:
+                self.window.blit(button.img, (button.x, button.y))
+
+    def check_click(self, x, y):
+        if self.state == "START":
+            for button in self.start_buttons:
+                if button.check_mask(x, y):
+                    return True
+        elif self.state == "BOARD":
+            for button in self.board_buttons:
+                if button.check_mask(x, y):
+                    return True
+        elif self.state == "SHOP":
+            for button in self.shop_buttons:
+                if button.check_mask(x, y):
+                    return True
+
+class Button:
+    def __init__(self, x, y, command, img):
+        self.x = x
+        self.y = y
+        self.img = img
+        self.mask = None
+        self.command = command
+        self.make_mask()
+
+    def make_mask(self):
+        self.mask = pygame.mask.from_threshold(self.img, (0, 0, 0), (1, 1, 1, 255))
+        self.mask.invert()
+
+    def check_mask(self, click_x, click_y):
+        rect = self.img.get_rect(topleft=(self.x, self.y))
+        if not rect.collidepoint(click_x, click_y):
+            print("not clicked")
+        elif click_x - self.x < 0 or click_y - self.y < 0:
+            print("not clicked")
+        else:
+            check_x, check_y = (click_x - self.x, click_y - self.y)
+            if self.mask.get_at((round(check_x), round(check_y))):
+                print("BUTTON PRESSED")
+                self.command()

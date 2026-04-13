@@ -1,6 +1,6 @@
 import pygame
 from layout import layout, TileType, BuildType
-from client_tile import Tile, Building, Button
+from client_tile import Tile, Building
 from constants import DIMENSION
 
 #class BoardState()

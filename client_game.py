@@ -1,8 +1,8 @@
 import pygame
 import json
-from client_board import Board, UI
+from client_board import Board
+from client_ui import UI, Button
 from client_player import PlayerCamera
-from client_tile import Button
 class Game:
 
     def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
@@ -13,13 +13,16 @@ class Game:
         self.client = client
         self.message_list = message_list
         self.new_msg = None
-        self.buttons = []
+        self.UI = UI(self.window)
+        self.board_buttons = []
+        self.shop_buttons = []
         self.state = "BOARD"
         self._init()
 
     def _init(self):
         self.camera = PlayerCamera(self.config)
         self.board = Board(self.window, self.config, self.camera)
+        self.UI.state = "BOARD"
         self.table = {
             "hello": self.say_hello,
             "message": self.print_message,
@@ -27,8 +30,11 @@ class Game:
             "update_turn": self.update_turn,
             "add_object": self.add_object
         }
+        self.click_table = {
 
-        self.buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
+        }
+
+        self.UI.board_buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
@@ -49,9 +55,6 @@ class Game:
             elif key_press == pygame.K_c:
                 self.center_board()
 
-    def check_buttons(self, x, y):
-        for button in self.buttons:
-            button.check_mask(x, y)
 
     def test_send(self):
         self.client.send("HELLO SERVER")
@@ -105,7 +108,7 @@ class Game:
 
     def check_pos(self, x, y, ):
         print(f"x: {x}, y: {y}")
-        self.check_buttons(x, y)
+        self.UI.check_click(x, y)
         self.board.check_click(x, y, self.player_turn)
 
     def check_all(self, d1, d2, x, y ):
@@ -151,14 +154,20 @@ class Game:
         self.board.draw_board()
 
 
-    def draw_board(self):
+    def update_board(self):
+        self.board.draw_board()
+        self.UI.draw()
+
+    def update_shop(self):
         pass
 
     def update(self):
         self.process_queue()
-        for button in self.buttons:
-            self.window.blit(button.img, (button.x, button.y))
-        self.board.draw_board()
+        if self.state == "BOARD":
+            self.update_board()
+        if self.state == "SHOP":
+            self.update_shop()
+
 
 '''
 class MoveCommand():
