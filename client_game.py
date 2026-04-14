@@ -1,5 +1,8 @@
 import pygame
 import json
+
+from jupyter_server.auth import passwd
+from client_shop import Shop
 from client_board import Board
 from client_ui import UI, Button
 from client_player import PlayerCamera
@@ -16,6 +19,7 @@ class Game:
         self.UI = UI(self.window)
         self.board_buttons = []
         self.shop_buttons = []
+        self.shop = Shop(window)
         self.state = "BOARD"
         self._init()
 
@@ -31,10 +35,19 @@ class Game:
             "add_object": self.add_object
         }
         self.click_table = {
-
+            "BOARD": self.board.check_click,
+            "SHOP":  self.shop.check_click,
+            "START": self.board.check_click # <- PLACEHOLDER
+        }
+        self.draw_table = {
+            "BOARD": self.board.draw_board,
+            "SHOP": self.shop.draw,
+            "START": None
         }
 
         self.UI.board_buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
+        self.UI.board_buttons.append(Button(10, 100, lambda: self.set_state("SHOP"), self.config.assets.imgs["shop"]))
+        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
@@ -54,7 +67,6 @@ class Game:
                 self.rotate(1)
             elif key_press == pygame.K_c:
                 self.center_board()
-
 
     def test_send(self):
         self.client.send("HELLO SERVER")
@@ -92,6 +104,11 @@ class Game:
         col = self.new_msg.get("col")
         self.board.add_object(col, row)
 
+    def set_state(self, new_state):
+        self.state = new_state
+        self.UI.state = new_state
+        print("game state: ", self.state)
+
     def say_hello(self):
         name = self.new_msg.get("name")
         print(f"Hello {name}!")
@@ -108,13 +125,8 @@ class Game:
 
     def check_pos(self, x, y, ):
         print(f"x: {x}, y: {y}")
-        self.UI.check_click(x, y)
-        self.board.check_click(x, y, self.player_turn)
-
-    def check_all(self, d1, d2, x, y ):
-        for build in self.board.tiles[d1][d2].building:
-            if build.check_click(x, y):
-                 build.draw_stat(self.window)
+        self.UI.check_click(x, y, self.state)
+        self.click_table[self.state](x, y, self.player_turn)
 
     def zoom(self, zoom):
         check = self.camera.zoom_level + zoom
@@ -153,20 +165,10 @@ class Game:
         self.board.update_masks()
         self.board.draw_board()
 
-
-    def update_board(self):
-        self.board.draw_board()
-        self.UI.draw()
-
-    def update_shop(self):
-        pass
-
     def update(self):
         self.process_queue()
-        if self.state == "BOARD":
-            self.update_board()
-        if self.state == "SHOP":
-            self.update_shop()
+        self.draw_table[self.state]()
+        self.UI.draw()
 
 
 '''

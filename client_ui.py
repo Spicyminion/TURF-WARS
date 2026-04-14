@@ -7,31 +7,22 @@ class UI:
         self.board_buttons = []
         self.shop_buttons = []
         self.state = "BOARD"
+        self.click_check = {
+            "BOARD": self.board_buttons,
+            "SHOP": self.shop_buttons,
+            "START": self.start_buttons
+        }
 
     def draw(self):
-        if self.state == "START":
-            for button in self.start_buttons:
-                self.window.blit(button.img, (button.x, button.y))
-        elif self.state == "BOARD":
-            for button in self.board_buttons:
-                self.window.blit(button.img, (button.x, button.y))
-        elif self.state == "SHOP":
-            for button in self.shop_buttons:
+            for button in self.click_check[self.state]:
                 self.window.blit(button.img, (button.x, button.y))
 
-    def check_click(self, x, y):
-        if self.state == "START":
-            for button in self.start_buttons:
-                if button.check_mask(x, y):
-                    return True
-        elif self.state == "BOARD":
-            for button in self.board_buttons:
-                if button.check_mask(x, y):
-                    return True
-        elif self.state == "SHOP":
-            for button in self.shop_buttons:
-                if button.check_mask(x, y):
-                    return True
+    def check_click(self, x, y, state):
+        for button in self.click_check[state]:
+            if button.check_mask(x, y):
+                button.command()
+
+
 
 class Button:
     def __init__(self, x, y, command, img):

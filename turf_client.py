@@ -105,14 +105,6 @@ def main():
                 game.check_key_pressed(event.key)
 
 
-            '''         
-            else:
-                x, y = pygame.mouse.get_pos()
-                d1, d2 = calc_tile_coord(x, y)
-                if 0 <= d1 <= (DIMENSION - 1) and 0 <= d2 <= (DIMENSION - 1):
-                    game.check_all(d1, d2, x, y)
-            '''
-
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_UP]:
