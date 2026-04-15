@@ -18,10 +18,13 @@ class UI:
                 self.window.blit(button.img, (button.x, button.y))
 
     def check_click(self, x, y, state):
+        status = False
         for button in self.click_check[state]:
             if button.check_mask(x, y):
                 button.command()
-
+                status = True
+                break
+        return status
 
 
 class Button:
@@ -40,9 +43,9 @@ class Button:
     def check_mask(self, click_x, click_y):
         rect = self.img.get_rect(topleft=(self.x, self.y))
         if not rect.collidepoint(click_x, click_y):
-            print("not clicked")
+            pass
         elif click_x - self.x < 0 or click_y - self.y < 0:
-            print("not clicked")
+            pass
         else:
             check_x, check_y = (click_x - self.x, click_y - self.y)
             if self.mask.get_at((round(check_x), round(check_y))):

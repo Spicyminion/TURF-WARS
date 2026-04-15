@@ -19,7 +19,7 @@ class Game:
         self.UI = UI(self.window)
         self.board_buttons = []
         self.shop_buttons = []
-        self.shop = Shop(window)
+        self.shop = Shop(window, config)
         self.state = "BOARD"
         self._init()
 
@@ -108,6 +108,7 @@ class Game:
         self.state = new_state
         self.UI.state = new_state
         print("game state: ", self.state)
+        self.update()
 
     def say_hello(self):
         name = self.new_msg.get("name")
@@ -125,8 +126,8 @@ class Game:
 
     def check_pos(self, x, y, ):
         print(f"x: {x}, y: {y}")
-        self.UI.check_click(x, y, self.state)
-        self.click_table[self.state](x, y, self.player_turn)
+        if not self.UI.check_click(x, y, self.state):
+            self.click_table[self.state](x, y, self.player_turn)
 
     def zoom(self, zoom):
         check = self.camera.zoom_level + zoom
