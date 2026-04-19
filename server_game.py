@@ -52,7 +52,10 @@ class Game:
         col = self.new_msg.get("col")
         row = self.new_msg.get("row")
         player_id = self.new_msg.get("id")
-        msg = {"action": "add_object", "col": f"{col}", "row": f"{row}", "id": f"{player_id}"}
+        object_type = self.new_msg.get("object_type")
+        msg = {"action": "add_object",
+               "col": f"{col}", "row": f"{row}", "object_type": f"{object_type}",
+               "id": f"{player_id}",}
         self.board.add_objects(msg)
         for client in self.clients:
             client.send(json.dumps(msg).encode())
@@ -64,8 +67,3 @@ class Game:
     def update(self):
         pass
         # do something for board
-
-'''
-class MoveCommand():
-    def __init__(self):
-'''

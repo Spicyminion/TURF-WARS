@@ -96,30 +96,28 @@ class PlayerCamera:
         zx = center_x + (tx - center_x) * self.zoom_level
         zy = center_y + (ty - center_y) * self.zoom_level
 
-        # Convert image center -> top-left for blitting
+        # Convert image center to TOP-LEFT for blitting
         screen_x = zx - (self.config.HALF_WIDTH * self.zoom_level)
         screen_y = zy - (self.config.HALF_HEIGHT * self.zoom_level)
 
         return screen_x, screen_y
 
     def camera_to_game(self, screen_x, screen_y):
-        print(f"ORIG: {screen_x}, {screen_y}")
         center_x = self.config.screen_width / 2
         center_y = self.config.screen_height / 2
 
         # Top-left -> image center
-        zx = screen_x + self.config.HALF_WIDTH
-        zy = screen_y + self.config.HALF_HEIGHT
+        zx = screen_x + (self.config.HALF_WIDTH * self.zoom_level)
+        zy = screen_y + (self.config.HALF_HEIGHT * self.zoom_level)
 
         # Undo zoom
         tx = center_x + ((zx - center_x) / self.zoom_level)
         ty = center_y + ((zy - center_y) / self.zoom_level)
-        print(f"TX, TY: {tx}, {ty}")
+
 
         # Undo translation (pan)
         rx = tx - self.x_offset
         ry = ty - self.y_offset
-        print(f"NON ROT {rx}, {ry}")
 
         # Undo rotation (rotate CCW)
         gx, gy = self.rotate_point_cw(
@@ -132,6 +130,4 @@ class PlayerCamera:
 
         cx = gx - self.config.INITIAL_OFFSET_X  - self.config.HALF_WIDTH
         cy = gy - self.config.INITIAL_OFFSET_Y
-        print(f"FINAL: {gx}, {gy}")
-        print(f"CENT: {cx}, {cy}")
         return gx, gy

@@ -1,13 +1,14 @@
 
 class Character:
-    def __init__(self, hp, dmg, img_key, row, col):
+    def __init__(self, hp, dmg, img_key, col, row, id):
         self.x = None
         self.y = None
         self.hp = hp
         self.damage = dmg
         self.img_key = img_key
-        self.row = row
         self.col = col
+        self.row = row
+        self.id = id
         self.moved = False
         self.options = False
         self.items = []
@@ -17,7 +18,7 @@ class Character:
         self.col = new_col
 
     def action_list(self):
-        pass
+        action = None
 
 
 

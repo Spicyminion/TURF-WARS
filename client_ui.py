@@ -5,22 +5,23 @@ class UI:
         self.window = window
         self.start_buttons = []
         self.board_buttons = []
+        self.action_buttons = []
         self.shop_buttons = []
         self.state = "BOARD"
         self.click_check = {
-            "BOARD": self.board_buttons,
-            "CHARACTER_SELECTED": self.board_buttons,
-            "SHOP": self.shop_buttons,
-            "START": self.start_buttons
+            "BOARD": lambda: self.board_buttons,
+            "CHARACTER_SELECTED": lambda: self.board_buttons + self.action_buttons,
+            "SHOP": lambda: self.shop_buttons,
+            "START": lambda: self.start_buttons
         }
 
     def draw(self):
-            for button in self.click_check[self.state]:
+            for button in self.click_check[self.state]():
                 self.window.blit(button.img, (button.x, button.y))
 
     def check_click(self, x, y, state):
         status = False
-        for button in self.click_check[state]:
+        for button in self.click_check[state]():
             if button.check_mask(x, y):
                 button.command()
                 status = True

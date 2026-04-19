@@ -20,8 +20,6 @@ class Game:
         self.message_list = message_list
         self.new_msg = None
         self.UI = UI(self.window)
-        self.board_buttons = []
-        self.shop_buttons = []
         self.shop = Shop(window, config)
         self.state = "BOARD"
         self._init()
@@ -77,14 +75,14 @@ class Game:
             elif key_press == pygame.K_c:
                 self.center_board()
 
-    def test_send(self):
-        self.client.send("HELLO SERVER")
-
     def process_queue(self):
         while not self.message_list.empty():
             msg = self.message_list.get()
             print(f"message from queue: {msg}")
             self.process_command(msg)
+
+    def display_actions(self):
+        pass
 
     def process_command(self, msg):
         action_type = msg.get("action")
@@ -106,13 +104,17 @@ class Game:
         self.board.player_turn = self.player_turn
 
     def request_add_object(self):
-        msg = json.dumps({"action": "add_object", "col": "3", "row": "3", "id": f"{self.player_id}"}).encode()
+        msg = json.dumps({"action": "add_object",
+                          "col": "3", "row": "3", "object_type": "CHARACTER",
+                          "id": f"{self.player_id}"}).encode()
         self.client.client.send(msg)
 
     def add_object(self):
         row = self.new_msg.get("row")
         col = self.new_msg.get("col")
-        self.board.add_object(col, row)
+        object_type = self.new_msg.get("object_type")
+        player_id = self.new_msg.get("id")
+        self.board.add_object(col, row, object_type, player_id)
 
     def set_state(self, new_state):
         self.state = new_state
@@ -153,7 +155,7 @@ class Game:
 
     def move_character(self, tile):
         #print(vars(tile))
-        row, col = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
+        col, row = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
         self.board.characters[0].row = row
         self.board.characters[0].col = col
 
