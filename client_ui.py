@@ -9,6 +9,7 @@ class UI:
         self.state = "BOARD"
         self.click_check = {
             "BOARD": self.board_buttons,
+            "CHARACTER_SELECTED": self.board_buttons,
             "SHOP": self.shop_buttons,
             "START": self.start_buttons
         }

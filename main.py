@@ -1,8 +1,7 @@
 import pygame
 from constants import NUM_OF_PLAYERS
-from game import Game
+from backup_files.game import Game
 from config import ConfigGame
-from player import Player
 
 ###############################
 # Init screen and load assets #

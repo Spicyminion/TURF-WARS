@@ -4,8 +4,10 @@ import json
 from jupyter_server.auth import passwd
 from client_shop import Shop
 from client_board import Board
+from client_character import Character
+from client_tile import Tile, Building
 from client_ui import UI, Button
-from client_player import PlayerCamera
+from client_player import PlayerCamera, Player
 class Game:
 
     def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
@@ -13,6 +15,7 @@ class Game:
         self.config = config
         self.player_id = None
         self.player_turn = 1
+        self.player = None
         self.client = client
         self.message_list = message_list
         self.new_msg = None
@@ -35,14 +38,20 @@ class Game:
             "add_object": self.add_object
         }
         self.click_table = {
-            "BOARD": self.board.check_click,
+            "BOARD": self.handle_board,
+            "CHARACTER_SELECTED": self.handle_board, # need to change
             "SHOP":  self.shop.check_click,
             "START": self.board.check_click # <- PLACEHOLDER
         }
         self.draw_table = {
             "BOARD": self.board.draw_board,
+            "CHARACTER_SELECTED": self.board.draw_board,
             "SHOP": self.shop.draw,
             "START": None
+        }
+        self.action_table = {
+            "ATTACK": None,
+            "MOVE": self.move_character,
         }
 
         self.UI.board_buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
@@ -88,6 +97,7 @@ class Game:
 
     def assign_id(self):
         self.player_id = self.new_msg.get("id")
+        self.player = Player(self.player_id)
         self.board.player_id = self.player_id
 
     def update_turn(self):
@@ -126,8 +136,26 @@ class Game:
 
     def check_pos(self, x, y, ):
         print(f"x: {x}, y: {y}")
-        if not self.UI.check_click(x, y, self.state):
-            self.click_table[self.state](x, y, self.player_turn)
+        if not self.UI.check_click(x, y, self.state):  # i.e we didn't click a button
+            self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning
+
+    def handle_board(self, x, y, turn):
+        if self.state == "CHARACTER_SELECTED":
+            tile = self.board.check_click(x, y, turn)
+            self.move_character(tile)
+            self.state = "BOARD"
+        elif self.state == "BOARD":
+            obj = self.board.check_click(x, y, turn)
+            if isinstance(obj, Character):
+                self.state = "CHARACTER_SELECTED"
+            else:
+                self.state = "BOARD"
+
+    def move_character(self, tile):
+        #print(vars(tile))
+        row, col = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
+        self.board.characters[0].row = row
+        self.board.characters[0].col = col
 
     def zoom(self, zoom):
         check = self.camera.zoom_level + zoom

@@ -1,7 +1,7 @@
-import pygame
 from board import Board, UI
-from player import PlayerCamera
-from tile import Button
+from backup_files.player import PlayerCamera
+
+
 class Game:
 
     def __init__(self, window, config, NUM_OF_PLAYERS):

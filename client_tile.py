@@ -43,11 +43,11 @@ class Building:
         self.draw_x = tile_x + self.tile_width - (self.w / 2)
         self.draw_y = tile_y + self.tile_height - (self.h / 2)
         self.id = id
+        self.revenue = 100
 
-    def draw_coords(self, x, y):
-        draw_x = x - self.w/2
-        draw_y = y - self.h/2
-        return draw_x, draw_y
+    def generate_money(self):
+        print("printing money WOOO!!!")
+        return self.revenue
 
     '''
     def draw_stat(self, window, x, y):
@@ -56,7 +56,6 @@ class Building:
         x, y = self.rect.x + w/2 - test.get_size()[0] / 2, self.rect.y
         window.blit(test, (x, y))
     '''
-
 
 
 

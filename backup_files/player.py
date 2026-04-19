@@ -6,7 +6,6 @@ from pygame.examples.scroll import zoom_factor
 from layout import layout, TileType
 from constants import DIMENSION, HALF_HEIGHT
 
-
 class Player:
 
     def __init__(self, player_id, window):

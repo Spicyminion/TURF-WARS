@@ -1,6 +1,7 @@
 import pygame
 from layout import layout, TileType, BuildType
 from client_tile import Tile, Building
+from client_character import Character
 from constants import DIMENSION
 
 #class BoardState()
@@ -20,6 +21,7 @@ class Board:
         self.board_center = (self.config.screen_width / 2) + (self.config.screen_height / 2) # start at true center of board
         self.tiles = []
         self.buttons = []
+        self.characters = [Character(10, 10, "smile", 0, 0)]
         self.define_grid()
         self.id = None
         self.player_turn = 1
@@ -70,13 +72,16 @@ class Board:
         y_build = y - (h/2) + self.HALF_HEIGHT * self.camera.zoom_level
         return x_build, y_build
 
+    def character_coords(self, x, y, img):
+        w, h = img.get_size()
+        x_build = x - (w / 2) + self.HALF_WIDTH * self.camera.zoom_level
+        y_build = y - (h / 2) + self.HALF_HEIGHT * self.camera.zoom_level
+        return x_build, y_build
+
     def add_object(self, col, row):
         tile = self.tiles[int(col)][int(row)]
         x, y = tile.x, tile.y
         tile.building = Building(col, row, self.config, BuildType.APARTMENT, 1, x, y, self.HALF_WIDTH, self.HALF_HEIGHT)
-
-    def character_coords(self, x, y, img):
-        pass
 
     def draw_board(self):
         for column in range(len(layout)):
@@ -102,6 +107,13 @@ class Board:
                     #building = tile.building
                     build_x, build_y = self.building_coords(tile_x, tile_y, self.local_imgs['apartment'])
                     self.window.blit(self.local_imgs['apartment'], (build_x, build_y))
+
+        for character in self.characters:
+            tile = self.tiles[character.row][character.col]
+            tile_x, tile_y = self.camera.game_to_camera(tile.x, tile.y)
+            draw_x, draw_y = self.character_coords(tile_x, tile_y, self.local_imgs[character.img_key])
+            img = self.local_imgs[character.img_key]
+            self.window.blit(img, (draw_x, draw_y))
 
 
     def game_to_tile(self, x, y):
@@ -194,6 +206,19 @@ class Board:
         rotation = self.camera.rotation_offset
         # Loop in REVERSE draw order (front-to-back visually).
         # This ensures if a building overlaps a tile behind it, you click the building.
+
+        # NEED TO ACCOUNT FOR ROTATION FOR CHARACTERS (NOT IMPLEMENTED)
+        # NEED TO STREAMLINE CONVERTING COORDINATES
+
+        for character in self.characters:
+            tile = self.tiles[character.row][character.col]
+            tile_screen_x, tile_screen_y = self.camera.game_to_camera(tile.x, tile.y)
+            img = self.local_imgs[character.img_key]
+            char_x, char_y = self.character_coords(tile_screen_x, tile_screen_y, img)
+            if self.check_mask(screen_x, screen_y, char_x, char_y, character.img_key):
+                print("character clicked!")
+                return character
+
         for column in reversed(range(len(layout))):
             for row in reversed(range(len(layout[column]))):
 
@@ -225,7 +250,7 @@ class Board:
                         )
                         if self.check_mask(screen_x, screen_y, build_screen_x, build_screen_y, 'apartment'):
                             print(f"Building clicked on logical tile: {column_rot}, {row_rot}")
-                            return tile
+                            return tile.building
                     else:
                         print("not your turn to interact with object")
 
