@@ -104,7 +104,6 @@ class PlayerCamera:
         return screen_x, screen_y
 
     def camera_to_game(self, screen_x, screen_y):
-        print(f"ORIG: {screen_x}, {screen_y}")
         center_x = self.config.screen_width / 2
         center_y = self.config.screen_height / 2
 
@@ -115,11 +114,11 @@ class PlayerCamera:
         # Undo zoom
         tx = center_x + ((zx - center_x) / self.zoom_level)
         ty = center_y + ((zy - center_y) / self.zoom_level)
-        print(f"TX, TY: {tx}, {ty}")
+
         # Undo translation (pan)
         rx = tx - self.x_offset
         ry = ty - self.y_offset
-        print(f"NON ROT {rx}, {ry}")
+
         # Undo rotation (rotate CCW)
         gx, gy = self.rotate_point_cw(
             rx, ry,
@@ -131,8 +130,6 @@ class PlayerCamera:
 
         cx = gx - self.config.INITIAL_OFFSET_X  - self.config.HALF_WIDTH
         cy = gy - self.config.INITIAL_OFFSET_Y
-        print(f"FINAL: {gx}, {gy}")
-        print(f"CENT: {cx}, {cy}")
         return gx, gy
 
 

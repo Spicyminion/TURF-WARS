@@ -55,6 +55,10 @@ class Game:
         self.UI.board_buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
         self.UI.board_buttons.append(Button(10, 100, lambda: self.set_state("SHOP"), self.config.assets.imgs["shop"]))
         self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
+        # ACTION LIST
+        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
+        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
+        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
@@ -137,7 +141,7 @@ class Game:
             self.client.client.send(json.dumps(msg).encode())
 
     def check_pos(self, x, y, ):
-        print(f"x: {x}, y: {y}")
+        #print(f"x: {x}, y: {y}")
         if not self.UI.check_click(x, y, self.state):  # i.e we didn't click a button
             self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning
 

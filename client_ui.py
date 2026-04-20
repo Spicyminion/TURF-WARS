@@ -1,8 +1,9 @@
 import pygame
 
 class UI:
-    def __init__(self, window):
+    def __init__(self, window, config):
         self.window = window
+        self.config = config
         self.start_buttons = []
         self.board_buttons = []
         self.action_buttons = []
