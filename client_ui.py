@@ -1,9 +1,8 @@
 import pygame
 
 class UI:
-    def __init__(self, window, config):
+    def __init__(self, window):
         self.window = window
-        self.config = config
         self.start_buttons = []
         self.board_buttons = []
         self.action_buttons = []
@@ -46,11 +45,12 @@ class Button:
     def check_mask(self, click_x, click_y):
         rect = self.img.get_rect(topleft=(self.x, self.y))
         if not rect.collidepoint(click_x, click_y):
-            pass
+            return False
         elif click_x - self.x < 0 or click_y - self.y < 0:
-            pass
+            return False
         else:
             check_x, check_y = (click_x - self.x, click_y - self.y)
             if self.mask.get_at((round(check_x), round(check_y))):
-                print("BUTTON PRESSED")
-                self.command()
+                return True
+
+        return False
