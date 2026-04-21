@@ -64,6 +64,7 @@ class Board:
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
                     tile.building = Building(column, row, self.config, BuildType.APARTMENT, 1)
+        self.add_object(3, 3, "CHARACTER", 1)
 
     def building_coords(self, x, y, img_key):
         img = self.local_imgs[img_key]
@@ -83,9 +84,13 @@ class Board:
         tile = self.tiles[int(col)][int(row)]
         x, y = tile.x, tile.y
         if object_type == "CHARACTER":
-            tile.characters.append(Character(10, 10, "smile", col, row, player_id))
+            char = Character(10, 10, "smile", col, row, player_id)
+            tile.characters.append(char)
+            self.characters.append(char)
         elif object_type == "BUILDING":
+            build = Building(col, row, self.config, BuildType.APARTMENT, player_id)
             tile.building = Building(col, row, self.config, BuildType.APARTMENT, player_id)
+            self.buildings.append(build)
 
     def draw_board(self):
         for column in range(len(layout)):

@@ -22,6 +22,8 @@ class Game:
         self.UI = UI(self.window)
         self.shop = Shop(window, config)
         self.state = "BOARD"
+        self.action_state = "NONE"
+        self.selected_char = None
         self._init()
 
     def _init(self):
@@ -48,17 +50,18 @@ class Game:
             "START": None
         }
         self.action_table = {
-            "ATTACK": None,
+            "ATTACK": self.attack_character,
             "MOVE": self.move_character,
+            "STAT": self.stat_character
         }
 
         self.UI.board_buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
         self.UI.board_buttons.append(Button(10, 100, lambda: self.set_state("SHOP"), self.config.assets.imgs["shop"]))
         self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
         # ACTION LIST
-        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
-        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
-        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
+        self.UI.action_buttons.append(Button(900, 10, lambda: self.set_action_state("ATTACK"), self.config.assets.imgs["attack_frame"]))
+        self.UI.action_buttons.append(Button(900, 100, lambda: self.set_action_state("MOVE"), self.config.assets.imgs["move_frame"]))
+        self.UI.action_buttons.append(Button(900, 200, lambda: self.set_action_state("STAT"), self.config.assets.imgs["stats_frame"]))
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
@@ -84,9 +87,6 @@ class Game:
             msg = self.message_list.get()
             print(f"message from queue: {msg}")
             self.process_command(msg)
-
-    def display_actions(self):
-        pass
 
     def process_command(self, msg):
         action_type = msg.get("action")
@@ -123,7 +123,12 @@ class Game:
     def set_state(self, new_state):
         self.state = new_state
         self.UI.state = new_state
-        print("game state: ", self.state)
+        print("game state:", self.state)
+        self.update()
+
+    def set_action_state(self, new_state):
+        self.action_state = new_state
+        print("action state:", self.action_state)
         self.update()
 
     def say_hello(self):
@@ -140,28 +145,52 @@ class Game:
             msg = {"action": "change_turn", "id": f"{self.player_id}"}
             self.client.client.send(json.dumps(msg).encode())
 
-    def check_pos(self, x, y, ):
-        #print(f"x: {x}, y: {y}")
+    def check_pos(self, x, y):
         if not self.UI.check_click(x, y, self.state):  # i.e we didn't click a button
             self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning
+        print(f"game state: {self.state} action state: {self.action_state}")
+
 
     def handle_board(self, x, y, turn):
+        obj = self.board.check_click(x, y, turn)
         if self.state == "CHARACTER_SELECTED":
-            tile = self.board.check_click(x, y, turn)
-            self.move_character(tile)
-            self.state = "BOARD"
+            if self.action_state != "NONE":
+                self.action_table[self.action_state](obj)
+                self.action_state = "NONE"
+                self.selected_char = None
+                self.set_state("BOARD")
         elif self.state == "BOARD":
-            obj = self.board.check_click(x, y, turn)
             if isinstance(obj, Character):
-                self.state = "CHARACTER_SELECTED"
+                self.set_state("CHARACTER_SELECTED")
+                self.selected_char = obj
             else:
-                self.state = "BOARD"
+                self.set_state("BOARD")
 
-    def move_character(self, tile):
+    def move_character(self, new_tile):
+        print("MOVING TEST")
         #print(vars(tile))
-        col, row = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
-        self.board.characters[0].row = row
-        self.board.characters[0].col = col
+        old_tile = self.board.tiles[self.selected_char.col][self.selected_char.row]
+        old_tile.characters.remove(self.selected_char)
+
+        self.selected_char.row = new_tile.row
+        self.selected_char.col = new_tile.col
+
+        new_tile = self.board.tiles[self.selected_char.col][self.selected_char.row]
+        new_tile.characters.append(self.selected_char)
+
+    def attack_character(self, tile):
+        print("ATTACKING TEST")
+        # print(vars(tile))
+        # col, row = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
+        # self.board.characters[0].row = row
+        # self.board.characters[0].col = col
+
+    def stat_character(self, tile):
+        print("STATS TEST")
+        # print(vars(tile))
+        # col, row = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
+        # self.board.characters[0].row = row
+        # self.board.characters[0].col = col
 
     def zoom(self, zoom):
         check = self.camera.zoom_level + zoom
