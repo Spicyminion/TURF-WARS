@@ -1,7 +1,5 @@
 import pygame
 import json
-
-from jupyter_server.auth import passwd
 from client_shop import Shop
 from client_board import Board
 from client_character import Character
@@ -150,11 +148,13 @@ class Game:
             self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning
         print(f"game state: {self.state} action state: {self.action_state}")
 
-
     def handle_board(self, x, y, turn):
         obj = self.board.check_click(x, y, turn)
         if self.state == "CHARACTER_SELECTED":
             if self.action_state != "NONE":
+                if obj is None:
+                    self.action_state = "NONE"
+                    self.state = "BOARD"
                 self.action_table[self.action_state](obj)
                 self.action_state = "NONE"
                 self.selected_char = None

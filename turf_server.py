@@ -7,7 +7,7 @@ from server_game import Game
 
 DESKTOP = "192.168.1.95" # desktop
 LAPTOP = "192.168.92.1" # laptop
-IP = DESKTOP # changes depending on where we're running the server from
+IP = LAPTOP # changes depending on where we're running the server from
 
 requests = queue.Queue()
 

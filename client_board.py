@@ -159,7 +159,7 @@ class Board:
             return None
 
         # Print the tile clicked on
-        print(f"TEST: target_col: {target_col} target_row: {target_row}")
+        #print(f"TEST: target_col: {target_col} target_row: {target_row}")
         tile = self.tiles[target_col][target_row]
 
         # Check where tile is on the screen
