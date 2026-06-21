@@ -41,13 +41,6 @@ class Building:
         print("printing money WOOO!!!")
         return self.revenue
 
-    '''
-    def draw_stat(self, window, x, y):
-        test = self.config.assets.get('test_stat')
-        w, h = self.rect.w, self.rect.h
-        x, y = self.rect.x + w/2 - test.get_size()[0] / 2, self.rect.y
-        window.blit(test, (x, y))
-    '''
 
 
 

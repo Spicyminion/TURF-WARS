@@ -1,6 +1,6 @@
 from client_ui import Button
 
-class Shop:
+class DummyShop:
     def __init__(self, window, config):
         self.characters = {
             "test1": {"health": "10", "cost": 200},
@@ -26,21 +26,3 @@ class Shop:
                 frame_x = start_x + (num2 * frame_width)
                 frame_y = start_y + (num * frame_height)
                 self.frames.append(Button(frame_x, frame_y, self.purchase_character, self.imgs["test_char_frame"]))
-
-    def check_click(self, x, y, turn):
-        status = False
-        for frame in self.frames:
-            if frame.check_mask(x, y):
-                return
-
-    def draw(self):
-        self.window.fill((44,215,247))
-        for frame in self.frames:
-            self.window.blit(frame.img, (frame.x, frame.y))
-
-    def purchase_character(self):
-        print("Purchase character... [NON FUNCTIONAL]")
-
-    def shop_button(self, x, y):
-        pass
-

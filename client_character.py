@@ -1,8 +1,7 @@
+from client_game import GameState
 
 class Character:
     def __init__(self, hp, dmg, img_key, col, row, id):
-        self.x = None
-        self.y = None
         self.hp = hp
         self.damage = dmg
         self.img_key = img_key
@@ -17,9 +16,17 @@ class Character:
         self.row = new_row
         self.col = new_col
 
-    def action_list(self):
-        action = None
+    def take_damage(self, dmg):
+        self.hp -= dmg
+        if self.hp <= 0:
+            print("aRIPgus, ur dead")
 
+    def add_item(self, item):
+        if len(self.items) < 2:
+            self.items.append(item)
+
+class CharacterSelectedState(GameState):
+    pass
 
 
 

@@ -47,6 +47,9 @@ class Game:
                 turn = {"action": "update_turn", "turn": f"{self.player_turn}"}
                 client.send(json.dumps(turn).encode())
 
+    def move_char(self):
+        pass
+
     def add_object(self):
         print("passing object to clients")
         col = self.new_msg.get("col")

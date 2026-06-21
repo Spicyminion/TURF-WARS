@@ -23,11 +23,12 @@ TILETYPE_TO_SPRITE = {
 class BuildType(Enum):
     APARTMENT = 0
     MALL = 1
+    OIL_RIG = 2
 
 BUILDTYPE_TO_SPRITE = {
     BuildType.APARTMENT: "apartment",
+    BuildType.OIL_RIG: "apartment",
     BuildType.MALL: "mall ",
-
 }
 
 

@@ -2,10 +2,18 @@ import pygame
 import json
 from client_shop import Shop
 from client_board import Board
-from client_character import Character
+from client_character import Character, CharacterSelectedState
 from client_tile import Tile, Building
-from client_ui import UI, Button
+from client_ui import HUD, Button
 from client_player import PlayerCamera, Player
+
+# IMPORTANT GAME TRACKING OBJECTS
+from client_dummy_board import DummyBoard
+from client_board_state import BoardIdleState
+from client_dummy_shop import DummyShop
+
+# Need to create Shop state object ^
+
 class Game:
 
     def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
@@ -17,17 +25,15 @@ class Game:
         self.client = client
         self.message_list = message_list
         self.new_msg = None
-        self.UI = UI(self.window)
-        self.shop = Shop(window, config)
-        self.state = "BOARD"
-        self.action_state = "NONE"
-        self.selected_char = None
+        self.UI = HUD(self)
+        #self.shop = DummyShop()
+        self.board = DummyBoard()
+        self.game_state = BoardIdleState(self)  # THIS IS VERY IMPORTANT
         self._init()
+
 
     def _init(self):
         self.camera = PlayerCamera(self.config)
-        self.board = Board(self.window, self.config, self.camera)
-        self.UI.state = "BOARD"
         self.table = {
             "hello": self.say_hello,
             "message": self.print_message,
@@ -35,31 +41,22 @@ class Game:
             "update_turn": self.update_turn,
             "add_object": self.add_object
         }
-        self.click_table = {
-            "BOARD": self.handle_board,
-            "CHARACTER_SELECTED": self.handle_board, # need to change
-            "SHOP":  self.shop.check_click,
-            "START": self.board.check_click # <- PLACEHOLDER
-        }
-        self.draw_table = {
-            "BOARD": self.board.draw_board,
-            "CHARACTER_SELECTED": self.board.draw_board,
-            "SHOP": self.shop.draw,
-            "START": None
-        }
-        self.action_table = {
-            "ATTACK": self.attack_character,
-            "MOVE": self.move_character,
-            "STAT": self.stat_character
-        }
 
-        self.UI.board_buttons.append(Button(10, 10, self.change_turn, self.config.assets.imgs["change_turn"]))
-        self.UI.board_buttons.append(Button(10, 100, lambda: self.set_state("SHOP"), self.config.assets.imgs["shop"]))
-        self.UI.shop_buttons.append(Button(10, 10, lambda: self.set_state("BOARD"), self.config.assets.imgs["board"]))
-        # ACTION LIST
-        self.UI.action_buttons.append(Button(900, 10, lambda: self.set_action_state("ATTACK"), self.config.assets.imgs["attack_frame"]))
-        self.UI.action_buttons.append(Button(900, 100, lambda: self.set_action_state("MOVE"), self.config.assets.imgs["move_frame"]))
-        self.UI.action_buttons.append(Button(900, 200, lambda: self.set_action_state("STAT"), self.config.assets.imgs["stats_frame"]))
+    def change_state(self, new_state):
+        self.game_state = new_state
+        print(f"state changed to {new_state}")
+
+    #def open_shop(self):
+    #    self.game_state = Shop(self)
+    #    print(f"state changed to shop")
+
+    def open_board(self):
+        self.game_state = BoardIdleState(self)
+        print(f"state changed to board")
+
+    def open_character(self, character):
+        self.game_state = CharacterSelectedState(self, character)
+        print(f"state changed to character selected")
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
@@ -111,23 +108,18 @@ class Game:
                           "id": f"{self.player_id}"}).encode()
         self.client.client.send(msg)
 
+    def cancel_action(self):
+        self.action_state = "NONE"
+        self.state = "BOARD"
+        self.UI.state = "BOARD"
+        self.selected_char = None
+
     def add_object(self):
         row = self.new_msg.get("row")
         col = self.new_msg.get("col")
         object_type = self.new_msg.get("object_type")
         player_id = self.new_msg.get("id")
         self.board.add_object(col, row, object_type, player_id)
-
-    def set_state(self, new_state):
-        self.state = new_state
-        self.UI.state = new_state
-        print("game state:", self.state)
-        self.update()
-
-    def set_action_state(self, new_state):
-        self.action_state = new_state
-        print("action state:", self.action_state)
-        self.update()
 
     def say_hello(self):
         name = self.new_msg.get("name")
@@ -144,17 +136,21 @@ class Game:
             self.client.client.send(json.dumps(msg).encode())
 
     def check_pos(self, x, y):
-        if not self.UI.check_click(x, y, self.state):  # i.e we didn't click a button
-            self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning
+        if not self.UI.check_click(x, y, self.state):  # i.e. we didn't click a button currently on the screen
+            self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning (pass click accordingly)
         print(f"game state: {self.state} action state: {self.action_state}")
 
     def handle_board(self, x, y, turn):
         obj = self.board.check_click(x, y, turn)
+        print(f"object clicked is: {obj}")
         if self.state == "CHARACTER_SELECTED":
             if self.action_state != "NONE":
                 if obj is None:
                     self.action_state = "NONE"
                     self.state = "BOARD"
+                    self.UI.state = "BOARD"
+                    print("exiting character selection without making an action")
+                    return
                 self.action_table[self.action_state](obj)
                 self.action_state = "NONE"
                 self.selected_char = None
@@ -166,31 +162,6 @@ class Game:
             else:
                 self.set_state("BOARD")
 
-    def move_character(self, new_tile):
-        print("MOVING TEST")
-        #print(vars(tile))
-        old_tile = self.board.tiles[self.selected_char.col][self.selected_char.row]
-        old_tile.characters.remove(self.selected_char)
-
-        self.selected_char.row = new_tile.row
-        self.selected_char.col = new_tile.col
-
-        new_tile = self.board.tiles[self.selected_char.col][self.selected_char.row]
-        new_tile.characters.append(self.selected_char)
-
-    def attack_character(self, tile):
-        print("ATTACKING TEST")
-        # print(vars(tile))
-        # col, row = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
-        # self.board.characters[0].row = row
-        # self.board.characters[0].col = col
-
-    def stat_character(self, tile):
-        print("STATS TEST")
-        # print(vars(tile))
-        # col, row = tile.col, tile.row  # NEED TO FIX THIS SO IT'S NOT SWAPPED
-        # self.board.characters[0].row = row
-        # self.board.characters[0].col = col
 
     def zoom(self, zoom):
         check = self.camera.zoom_level + zoom
@@ -234,8 +205,9 @@ class Game:
         self.draw_table[self.state]()
         self.UI.draw()
 
+class GameState:
+    def __init__(self, game):
+        self.game = game
 
-'''
-class MoveCommand():
-    def __init__(self):
-'''
+
+
