@@ -2,12 +2,12 @@ from constants import *
 from layout import *
 
 class BoardRenderer:
-    def __init__(self, window, config, camera, images, masks):
+    def __init__(self, window, config, camera):
         self.window = window
         self.config = config
         self.camera = camera
-        self.images = images
-        self.masks = masks
+        self.images = config.assets.imgs
+        self.masks = config.assets.masks
 
         self.HALF_WIDTH = self.config.HALF_WIDTH
         self.HALF_HEIGHT = self.config.HALF_HEIGHT

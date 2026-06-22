@@ -1,5 +1,7 @@
 import pygame
 import json
+
+from client_board_renderer import BoardRenderer
 from client_shop import Shop
 from client_board import Board
 from client_character import Character, CharacterSelectedState
@@ -34,6 +36,7 @@ class Game:
 
     def _init(self):
         self.camera = PlayerCamera(self.config)
+        self.board_renderer = BoardRenderer(self.window, self.config, self.camera)
         self.table = {
             "hello": self.say_hello,
             "message": self.print_message,
@@ -57,6 +60,9 @@ class Game:
     def open_character(self, character):
         self.game_state = CharacterSelectedState(self, character)
         print(f"state changed to character selected")
+
+    def draw(self):
+        self.board_renderer.draw_board(self.board)
 
     def check_key_pressed(self, key_press):
         if self.state == "BOARD":
@@ -107,12 +113,6 @@ class Game:
                           "col": "3", "row": "3", "object_type": "CHARACTER",
                           "id": f"{self.player_id}"}).encode()
         self.client.client.send(msg)
-
-    def cancel_action(self):
-        self.action_state = "NONE"
-        self.state = "BOARD"
-        self.UI.state = "BOARD"
-        self.selected_char = None
 
     def add_object(self):
         row = self.new_msg.get("row")
