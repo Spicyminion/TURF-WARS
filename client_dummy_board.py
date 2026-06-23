@@ -30,6 +30,21 @@ class DummyBoard:
         # Add code later
         #tile = self.tiles[int(col)][int(row)]
 
+    def move_character(self, character, new_column, new_row, old_column, old_row):
+        old_tile = self..tiles[self.character.col][self.character.row]
+        new_tile =
+        old_tile.characters.remove(self.character)
+
+        character.row = new_tile.row
+        self.character_selected.col = new_tile.col
+
+        new_tile = self.board.tiles[self.character_selected.col][self.character_selected.row]
+        new_tile.characters.append(self.character_selected)
+
+        self.game.change_state(BoardIdleState(self.game))  # return to idle state
+
+    def attack_character(self, character, damage):
+        pass
 
 
 

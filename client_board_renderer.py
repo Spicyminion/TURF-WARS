@@ -2,17 +2,74 @@ from constants import *
 from layout import *
 
 class BoardRenderer:
-    def __init__(self, window, config, camera):
-        self.window = window
-        self.config = config
-        self.camera = camera
-        self.images = config.assets.imgs
-        self.masks = config.assets.masks
+    def __init__(self, game):
+        self.game = game
+        self.window = game.window
+        self.config = game.config
+        self.camera = game.camera
+        self.board = game.board
+        self.images = game.config.assets.imgs
+        self.masks = game.config.assets.masks
 
         self.HALF_WIDTH = self.config.HALF_WIDTH
         self.HALF_HEIGHT = self.config.HALF_HEIGHT
         self.INITIAL_OFFSET_X = self.config.INITIAL_OFFSET_X
         self.INITIAL_OFFSET_Y = self.config.INITIAL_OFFSET_Y
+
+    ###########################
+    # Modify camera functions #
+    ###########################
+
+    def zoom(self, zoom):
+        check = self.camera.zoom_level + zoom
+        if check < 1 or check > 3:
+            pass
+        else:
+            self.camera.zoom_level+=zoom
+            self.camera.move_camera()
+            self.board.update_imgs()
+            self.board.update_masks()
+            self.board.draw_board()
+
+    def update_imgs(self):
+        zoom = self.camera.zoom_level
+        for name, img in self.config.assets.imgs.items():
+            w, h = img.get_size()
+            img = pygame.transform.scale(img, (round(w * zoom), round(h * zoom)))
+            self.images[name] = img
+
+    def update_masks(self):
+        for name, img in self.images.items():
+            mask = pygame.mask.from_threshold(img, (0, 0, 0), (1, 1, 1, 255))
+            mask.invert()
+            self.masks[name] = mask
+
+    def move_y(self, increment):
+        self.camera.y_offset += increment
+        self.camera.move_camera()
+
+    def move_x(self, increment):
+        self.camera.x_offset += increment
+        self.camera.move_camera()
+
+    def rotate(self, direction):
+        check = self.camera.rotation_offset + direction
+        if check > 3:
+            self.camera.rotation_offset = 0
+        elif check < 0:
+            self.camera.rotation_offset = 3
+        else:
+            self.camera.rotation_offset += direction
+        self.board.update_imgs()
+
+    def center_board(self):
+        self.camera.center_board()
+        self.update_imgs()
+        self.update_masks()
+
+    ######################################
+    # Translate coords to object clicked #
+    ######################################
 
     def convert_to_tile_coords(self, col, row):
         x = (self.camera.OFFSET_X + (self.HALF_WIDTH * col) - (self.HALF_WIDTH * row))
@@ -99,7 +156,7 @@ class BoardRenderer:
 
         if target_col < 0 or target_col >= DIMENSION or target_row < 0 or target_row >= DIMENSION:
             print("Clicked outside the board bounds!")
-            return None
+            return None, None
 
         # Print the tile clicked on
         #print(f"TEST: target_col: {target_col} target_row: {target_row}")
@@ -114,17 +171,17 @@ class BoardRenderer:
                 char_x, char_y = self.character_coords(tile_screen_x, tile_screen_y, character.img_key)
                 if self.check_mask(screen_x, screen_y, char_x, char_y, character.img_key):
                     print(f"CHARACTER clicked on tile: {target_col}, {target_row}")
-                    return character
+                    return "CHAR", character
         if tile.building:
             build_screen_x, build_screen_y = self.building_coords(
                 tile_screen_x, tile_screen_y, 'apartment')
             if self.check_mask(screen_x, screen_y, build_screen_x, build_screen_y, 'apartment'):
                 print(f"BUILDING clicked on tile: {target_col}, {target_row}")
-                return tile.building
+                return "BUILD", tile.building
         if self.check_mask(screen_x, screen_y, tile_screen_x, tile_screen_y, tile.img_key):
             print(f"Tile: {target_col}, {target_row} clicked")
-            return tile
+            return "TILE    ", tile
         else:
-            return None
+            return None, None
 
 

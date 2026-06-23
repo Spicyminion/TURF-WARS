@@ -10,7 +10,6 @@ class Player:
         self.money = 200
         self.camera = PlayerCamera
 
-
 class PlayerCamera:
     def __init__(self, config):
         self.zoom_level = 1.0

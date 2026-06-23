@@ -4,7 +4,8 @@ import json
 from client_board_renderer import BoardRenderer
 from client_shop import Shop
 from client_board import Board
-from client_character import Character, CharacterSelectedState
+from client_character import Character
+from client_character_state import CharacterSelectedState, CharacterMoveState, CharacterAttackState
 from client_tile import Tile, Building
 from client_ui import HUD, Button
 from client_player import PlayerCamera, Player
@@ -27,7 +28,7 @@ class Game:
         self.client = client
         self.message_list = message_list
         self.new_msg = None
-        self.UI = HUD(self)
+        self.hud = HUD(self)
         #self.shop = DummyShop()
         self.board = DummyBoard()
         self.game_state = BoardIdleState(self)  # THIS IS VERY IMPORTANT
@@ -36,7 +37,7 @@ class Game:
 
     def _init(self):
         self.camera = PlayerCamera(self.config)
-        self.board_renderer = BoardRenderer(self.window, self.config, self.camera)
+        self.board_renderer = BoardRenderer(self)
         self.table = {
             "hello": self.say_hello,
             "message": self.print_message,
@@ -44,6 +45,10 @@ class Game:
             "update_turn": self.update_turn,
             "add_object": self.add_object
         }
+
+    #################
+    # Change states #
+    #################
 
     def change_state(self, new_state):
         self.game_state = new_state
@@ -61,27 +66,25 @@ class Game:
         self.game_state = CharacterSelectedState(self, character)
         print(f"state changed to character selected")
 
-    def draw(self):
+    def draw_screen(self):
         self.board_renderer.draw_board(self.board)
+        self.hud.draw_hud()
+
+    #################
+    # Handle clicks #
+    #################
+
+    def check_pos(self, x, y):
+        if not self.hud.check_click(x, y):  # i.e. we didn't click a button currently on the screen
+            self.game_state.handle_click(x, y)
 
     def check_key_pressed(self, key_press):
-        if self.state == "BOARD":
-            if key_press == pygame.K_z:
-                self.zoom(1)
-                print("zooming in")
-            elif key_press == pygame.K_x:
-                self.zoom(-1)
-                print("zooming out")
-            elif key_press == pygame.K_t:
-                print("requesting to change turn ")
-                self.change_turn()
-            elif key_press == pygame.K_a:
-                print("requesting to add object")
-                self.request_add_object()
-            elif key_press == pygame.K_r:
-                self.rotate(1)
-            elif key_press == pygame.K_c:
-                self.center_board()
+        if key_press == pygame.K_t:
+            print("requesting to change turn ")
+            self.change_turn()
+        elif key_press == pygame.K_a:
+            print("requesting to add object")
+            self.request_add_object()
 
     def process_queue(self):
         while not self.message_list.empty():
@@ -135,75 +138,9 @@ class Game:
             msg = {"action": "change_turn", "id": f"{self.player_id}"}
             self.client.client.send(json.dumps(msg).encode())
 
-    def check_pos(self, x, y):
-        if not self.UI.check_click(x, y, self.state):  # i.e. we didn't click a button currently on the screen
-            self.click_table[self.state](x, y, self.player_turn) # ignore syntax warning (pass click accordingly)
-        print(f"game state: {self.state} action state: {self.action_state}")
-
-    def handle_board(self, x, y, turn):
-        obj = self.board.check_click(x, y, turn)
-        print(f"object clicked is: {obj}")
-        if self.state == "CHARACTER_SELECTED":
-            if self.action_state != "NONE":
-                if obj is None:
-                    self.action_state = "NONE"
-                    self.state = "BOARD"
-                    self.UI.state = "BOARD"
-                    print("exiting character selection without making an action")
-                    return
-                self.action_table[self.action_state](obj)
-                self.action_state = "NONE"
-                self.selected_char = None
-                self.set_state("BOARD")
-        elif self.state == "BOARD":
-            if isinstance(obj, Character):
-                self.set_state("CHARACTER_SELECTED")
-                self.selected_char = obj
-            else:
-                self.set_state("BOARD")
-
-
-    def zoom(self, zoom):
-        check = self.camera.zoom_level + zoom
-        if check < 1 or check > 3:
-            pass
-        else:
-            self.camera.zoom_level+=zoom
-            self.camera.move_camera()
-            self.board.update_imgs()
-            self.board.update_masks()
-            self.board.draw_board()
-
-    def move_y(self, increment):
-        self.camera.y_offset += increment
-        self.camera.move_camera()
-        self.board.draw_board()
-
-    def move_x(self, increment):
-        self.camera.x_offset += increment
-        self.camera.move_camera()
-        self.board.draw_board()
-
-    def rotate(self, direction):
-        check = self.camera.rotation_offset + direction
-        if check > 3:
-            self.camera.rotation_offset = 0
-        elif check < 0:
-            self.camera.rotation_offset = 3
-        else:
-            self.camera.rotation_offset += direction
-        self.board.update_imgs()
-
-    def center_board(self):
-        self.camera.center_board()
-        self.board.update_imgs()
-        self.board.update_masks()
-        self.board.draw_board()
-
     def update(self):
         self.process_queue()
-        self.draw_table[self.state]()
-        self.UI.draw()
+        self.draw_screen()
 
 class GameState:
     def __init__(self, game):

@@ -12,33 +12,23 @@ class HUD:
         self.shop_buttons = []
 
         # PERMANENT OVERLAY BUTTONS
-        #self.permanent_buttons.append(Button(10, 10, self.game.change_turn, self.config.assets.imgs["change_turn"]))
+        #self.permanent_buttons.append(Button(10, 10, self.game.change_turn, self.config.assets.imgs["change_turn"])) # <- ADD LATER
         #self.permanent_buttons.append(Button(10, 100, lambda: self.game.change_state(self.), self.config.assets.imgs["shop"]))  # <- ADD LATER
         self.permanent_buttons.append(Button(10, 10, lambda: self.game.open_board(), self.config.assets.imgs["board"]))
 
 
-    def draw(self, state):
+    def draw_hud(self):
             for button in self.permanent_buttons:
                 self.window.blit(button.img, (button.x, button.y))
-            for button in state:
-                self.window.blit(button.img, (button.x, button.y))
 
-    def draw_hud(self):
-        pass # might not need this method
-
-    def check_click(self, x, y, state):
-        status = False
+    def check_click(self, x, y):
+        button_clicked = None
         for button in self.permanent_buttons:
             if button.check_mask(x, y):
-                button.command()
-                status = True
+                button_clicked = button
                 break
-        for button in state:
-            if button.check_mask(x, y):
-                button.command()
-                status = True
-                break
-        return status
+        if button_clicked:
+            button_clicked.command()
 
 class Button:
     def __init__(self, x, y, command, img):
@@ -63,6 +53,5 @@ class Button:
             check_x, check_y = (click_x - self.x, click_y - self.y)
             if self.mask.get_at((round(check_x), round(check_y))):
                 return True
-
         return False
 
