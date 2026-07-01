@@ -36,7 +36,7 @@ class Board:
             w, h = img.get_size()
             img = pygame.transform.scale(img, (round(w * zoom), round(h * zoom)))
             self.local_imgs[name] = img
-        #self.draw_board()
+        self.draw_board()
 
     def update_masks(self):
         for name, img in self.local_imgs.items():

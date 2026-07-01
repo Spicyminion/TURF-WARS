@@ -8,13 +8,16 @@ class BoardRenderer:
         self.config = game.config
         self.camera = game.camera
         self.board = game.board
-        self.images = game.config.assets.imgs
-        self.masks = game.config.assets.masks
-
+        self.images = {}
+        self.masks = {}
         self.HALF_WIDTH = self.config.HALF_WIDTH
         self.HALF_HEIGHT = self.config.HALF_HEIGHT
         self.INITIAL_OFFSET_X = self.config.INITIAL_OFFSET_X
         self.INITIAL_OFFSET_Y = self.config.INITIAL_OFFSET_Y
+        for name,img in self.config.assets.imgs.items():
+            self.images[name] = img
+        self.update_masks()
+        self.update_masks()
 
     ###########################
     # Modify camera functions #
@@ -26,17 +29,17 @@ class BoardRenderer:
             pass
         else:
             self.camera.zoom_level+=zoom
-            self.camera.move_camera()
-            self.board.update_imgs()
-            self.board.update_masks()
-            self.board.draw_board()
+            print(f"CAMERA ZOOM LEVEL: {self.camera.zoom_level}")
+            self.update_imgs()
+            self.update_masks()
+
 
     def update_imgs(self):
         zoom = self.camera.zoom_level
         for name, img in self.config.assets.imgs.items():
             w, h = img.get_size()
-            img = pygame.transform.scale(img, (round(w * zoom), round(h * zoom)))
-            self.images[name] = img
+            img_new = pygame.transform.scale(img, (round(w * zoom), round(h * zoom)))
+            self.images[name] = img_new
 
     def update_masks(self):
         for name, img in self.images.items():
@@ -46,11 +49,9 @@ class BoardRenderer:
 
     def move_y(self, increment):
         self.camera.y_offset += increment
-        self.camera.move_camera()
 
     def move_x(self, increment):
         self.camera.x_offset += increment
-        self.camera.move_camera()
 
     def rotate(self, direction):
         check = self.camera.rotation_offset + direction
@@ -60,7 +61,6 @@ class BoardRenderer:
             self.camera.rotation_offset = 3
         else:
             self.camera.rotation_offset += direction
-        self.board.update_imgs()
 
     def center_board(self):
         self.camera.center_board()
@@ -110,7 +110,8 @@ class BoardRenderer:
                     row_rot = row
 
                 tile = dummy_board.tiles[column_rot][row_rot]
-                tile_x, tile_y = self.camera.game_to_camera(tile.x, tile.y) # convert to screen
+                tile_x, tile_y = self.convert_to_tile_coords(column_rot, row_rot) # index -> orig screen (x,y)
+                tile_x, tile_y = self.camera.game_to_camera(tile_x, tile_y)  # orig screen coords -> current camera (x,y)
                 img = self.images[tile.img_key]
                 self.window.blit(img, (tile_x, tile_y))
 
@@ -125,7 +126,6 @@ class BoardRenderer:
                         self.window.blit(self.images[character.img_key], (draw_x, draw_y))
 
     def check_mask(self, click_x, click_y, img_x, img_y, img_type):
-
         mask = self.masks[img_type]
         image = self.images[img_type]
         rect = image.get_rect(topleft=(img_x, img_y))
@@ -180,8 +180,9 @@ class BoardRenderer:
                 return "BUILD", tile.building
         if self.check_mask(screen_x, screen_y, tile_screen_x, tile_screen_y, tile.img_key):
             print(f"Tile: {target_col}, {target_row} clicked")
-            return "TILE    ", tile
+            return "TILE", tile
         else:
+            print("Clicked outside the board bounds!")
             return None, None
 
 

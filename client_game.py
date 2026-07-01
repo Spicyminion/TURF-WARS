@@ -2,12 +2,8 @@ import pygame
 import json
 
 from client_board_renderer import BoardRenderer
-from client_shop import Shop
-from client_board import Board
-from client_character import Character
-from client_character_state import CharacterSelectedState, CharacterMoveState, CharacterAttackState
-from client_tile import Tile, Building
-from client_ui import HUD, Button
+from client_board_state import CharacterSelectedState, CharacterMoveState, CharacterAttackState
+from client_ui import HUD
 from client_player import PlayerCamera, Player
 
 # IMPORTANT GAME TRACKING OBJECTS
@@ -19,31 +15,39 @@ from client_dummy_shop import DummyShop
 
 class Game:
 
-    def __init__(self, window, config, client, message_list, NUM_OF_PLAYERS):
+    def __init__(self, window, config, ui_manager, client, message_list, num_of_players):
         self.window = window
         self.config = config
+
         self.player_id = None
-        self.player_turn = 1
-        self.player = None
+        self.message_counter = 0
+        self.waiting_for_response_id = None
+        self.waiting_for_response = False
         self.client = client
         self.message_list = message_list
         self.new_msg = None
+
+        self.player_turn = 1
+        self.player = None
+        self.ui_manager = ui_manager
+
         self.hud = HUD(self)
         #self.shop = DummyShop()
         self.board = DummyBoard()
-        self.game_state = BoardIdleState(self)  # THIS IS VERY IMPORTANT
-        self._init()
-
-
-    def _init(self):
         self.camera = PlayerCamera(self.config)
         self.board_renderer = BoardRenderer(self)
+        self.game_state = BoardIdleState(self)
+        self.board_open = True
+        self._init()
+
+    def _init(self):
         self.table = {
             "hello": self.say_hello,
             "message": self.print_message,
             "player_id": self.assign_id,
-            "update_turn": self.update_turn,
-            "add_object": self.add_object
+            "CHANGE_TURN": self.change_turn,
+            "add_object": self.add_object,
+            "MOVE": self.move_character_from_server
         }
 
     #################
@@ -51,6 +55,8 @@ class Game:
     #################
 
     def change_state(self, new_state):
+        if hasattr(self.game_state, 'cleanup'):
+            self.game_state.cleanup()
         self.game_state = new_state
         print(f"state changed to {new_state}")
 
@@ -59,6 +65,8 @@ class Game:
     #    print(f"state changed to shop")
 
     def open_board(self):
+        if hasattr(self.game_state, 'cleanup'):
+            self.game_state.cleanup()
         self.game_state = BoardIdleState(self)
         print(f"state changed to board")
 
@@ -67,24 +75,34 @@ class Game:
         print(f"state changed to character selected")
 
     def draw_screen(self):
-        self.board_renderer.draw_board(self.board)
-        self.hud.draw_hud()
+        self.game_state.draw()
+        if self.waiting_for_response:
+            pass
+            #print("Waiting for response!!!")
+        #self.hud.draw_hud()
 
     #################
     # Handle clicks #
     #################
 
     def check_pos(self, x, y):
-        if not self.hud.check_click(x, y):  # i.e. we didn't click a button currently on the screen
-            self.game_state.handle_click(x, y)
+        #if not self.hud.check_click(x, y):  # i.e. we didn't click a button currently on the screen
+        if hasattr(self.game_state, 'handle_click'):
+            if not self.waiting_for_response_id:
+                self.game_state.handle_click(x, y)
+            else:
+                print("can't process clicks while waiting for server")
 
     def check_key_pressed(self, key_press):
-        if key_press == pygame.K_t:
-            print("requesting to change turn ")
-            self.change_turn()
-        elif key_press == pygame.K_a:
-            print("requesting to add object")
-            self.request_add_object()
+        self.game_state.handle_key_pressed(key_press)
+
+    def check_buttons_pressed(self, event):
+        if not self.hud.handle_button_pressed(event):
+            self.game_state.handle_button_pressed(event)
+
+    ################
+    # Handle sever #
+    ################
 
     def process_queue(self):
         while not self.message_list.empty():
@@ -94,22 +112,29 @@ class Game:
 
     def process_command(self, msg):
         action_type = msg.get("action")
+        message_id = msg.get("message_id")
+
         function = self.table.get(action_type)
+
         if function:
             self.new_msg = msg
             function()
+
+            if message_id == self.waiting_for_response_id:
+                self.waiting_for_response_id = None
+                self.waiting_for_response = False
         else:
-            print("Unknown command received")
+            print(f"Unknown command received: {action_type}")
 
     def assign_id(self):
         self.player_id = self.new_msg.get("id")
         self.player = Player(self.player_id)
-        self.board.player_id = self.player_id
+        pygame.display.set_caption(f"TURF WARS - player {self.player_id}")
 
-    def update_turn(self):
-        msg = self.new_msg.get("turn")
-        self.player_turn = msg
-        self.board.player_turn = self.player_turn
+    def move_character_from_server(self):
+        col, row = self.new_msg.get("new_col"), self.new_msg.get("new_row")
+        character_id = self.new_msg.get("character_id")
+        self.board.move_character(character_id, col, row)
 
     def request_add_object(self):
         msg = json.dumps({"action": "add_object",
@@ -124,6 +149,17 @@ class Game:
         player_id = self.new_msg.get("id")
         self.board.add_object(col, row, object_type, player_id)
 
+    def send_to_server(self, data_dict, message_id):
+        try:
+            json_string = json.dumps(data_dict).encode('utf-8')
+            self.client.client.send(json_string)
+            self.waiting_for_response = True
+            self.waiting_for_response_id = message_id
+            self.message_counter += 1
+
+        except Exception as e:
+            print(f"Network error {e}")
+
     def say_hello(self):
         name = self.new_msg.get("name")
         print(f"Hello {name}!")
@@ -133,18 +169,13 @@ class Game:
         print(f"message from server: {message}")
 
     def change_turn(self):
-        print(f"player_id: {self.player_id} player turn: {self.player_turn}")
-        if int(self.player_id) == int(self.player_turn):
-            msg = {"action": "change_turn", "id": f"{self.player_id}"}
-            self.client.client.send(json.dumps(msg).encode())
+        self.player_turn = self.new_msg.get("turn")
+        print(f"Now player {self.player_turn}'s turn!")
 
     def update(self):
         self.process_queue()
-        self.draw_screen()
 
-class GameState:
-    def __init__(self, game):
-        self.game = game
+
 
 
 

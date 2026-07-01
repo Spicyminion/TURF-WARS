@@ -2,13 +2,11 @@ import pygame
 from layout import layout, TileType
 from constants import DIMENSION, HALF_HEIGHT
 
-
 class Player:
-
-    def __init__(self, player_id, window):
+    def __init__(self, player_id):
         self.id = player_id
         self.money = 200
-        self.camera = PlayerCamera
+        self.health = 20
 
 class PlayerCamera:
     def __init__(self, config):
@@ -23,6 +21,7 @@ class PlayerCamera:
     def move_camera(self):
         half_width = self.config.HALF_WIDTH * self.zoom_level
         half_height = self.config.HALF_HEIGHT * self.zoom_level
+        '''
         self.OFFSET_X = (
                 (self.config.screen_width / 2)
                  - half_width
@@ -33,15 +32,15 @@ class PlayerCamera:
                 - (half_height * 2 * DIMENSION / 2) +
                 self.y_offset
         )
+        '''
 
     def center_board(self):
         self.x_offset = 0
         self.y_offset = 0
         self.rotation_offset = 0
         self.zoom_level = 1.0
-        self.move_camera()
-        self.OFFSET_X = self.config.INITIAL_OFFSET_X
-        self.OFFSET_Y = self.config.INITIAL_OFFSET_Y
+        #self.OFFSET_X = self.config.INITIAL_OFFSET_X
+        #self.OFFSET_Y = self.config.INITIAL_OFFSET_Y
 
     def rotate_point_cw(self, x, y, cx, cy, turns, half_width, half_height):
         """
@@ -112,7 +111,6 @@ class PlayerCamera:
         # Undo zoom
         tx = center_x + ((zx - center_x) / self.zoom_level)
         ty = center_y + ((zy - center_y) / self.zoom_level)
-
 
         # Undo translation (pan)
         rx = tx - self.x_offset

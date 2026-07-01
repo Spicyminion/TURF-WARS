@@ -3,7 +3,6 @@ import json
 import threading
 import queue
 from server_game import Game
-#import sys
 
 DESKTOP = "192.168.1.95" # desktop
 LAPTOP = "192.168.92.1" # laptop
