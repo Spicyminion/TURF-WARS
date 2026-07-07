@@ -3,6 +3,8 @@ import json
 
 from client_board_renderer import BoardRenderer
 from client_board_state import CharacterSelectedState, CharacterMoveState, CharacterAttackState
+from client_shop_renderer import ShopRenderer
+from client_shop_state import ShopState
 from client_ui import HUD
 from client_player import PlayerCamera, Player
 
@@ -11,7 +13,6 @@ from client_dummy_board import DummyBoard
 from client_board_state import BoardIdleState
 from client_dummy_shop import DummyShop
 
-# Need to create Shop state object ^
 
 class Game:
 
@@ -32,10 +33,11 @@ class Game:
         self.ui_manager = ui_manager
 
         self.hud = HUD(self)
-        #self.shop = DummyShop()
+        self.shop = DummyShop()
         self.board = DummyBoard()
         self.camera = PlayerCamera(self.config)
         self.board_renderer = BoardRenderer(self)
+        self.shop_renderer = ShopRenderer(self)
         self.game_state = BoardIdleState(self)
         self.board_open = True
         self._init()
@@ -60,9 +62,9 @@ class Game:
         self.game_state = new_state
         print(f"state changed to {new_state}")
 
-    #def open_shop(self):
-    #    self.game_state = Shop(self)
-    #    print(f"state changed to shop")
+    def open_shop(self):
+        self.game_state = ShopState(self)
+        print(f"state changed to shop")
 
     def open_board(self):
         if hasattr(self.game_state, 'cleanup'):
@@ -135,6 +137,10 @@ class Game:
         col, row = self.new_msg.get("new_col"), self.new_msg.get("new_row")
         character_id = self.new_msg.get("character_id")
         self.board.move_character(character_id, col, row)
+
+    def purchase_character_from_server(self):
+        purchase_character = self.new_msg.get("purchase_character")
+
 
     def request_add_object(self):
         msg = json.dumps({"action": "add_object",

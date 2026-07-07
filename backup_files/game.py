@@ -1,4 +1,4 @@
-from board import Board, UI
+from backup_files.board import Board, UI
 from backup_files.player import PlayerCamera
 
 

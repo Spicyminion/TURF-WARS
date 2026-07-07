@@ -140,7 +140,7 @@ class BoardRenderer:
             else:
                 return False
 
-    def check_click(self, screen_x, screen_y, dummy_board):
+    def check_click(self, screen_x, screen_y, dummy_board, check_entities=True):
 
         gx, gy = self.camera.camera_to_game(screen_x, screen_y)
         cx = gx - self.INITIAL_OFFSET_X - self.HALF_WIDTH
@@ -166,18 +166,20 @@ class BoardRenderer:
         tile_x, tile_y = self.convert_to_tile_coords(target_col, target_row)
         tile_screen_x, tile_screen_y = self.camera.game_to_camera(tile_x, tile_y)
 
-        if tile.characters:
+        # Check for characters and buildings if flag is true
+        if check_entities and tile.characters:
             for character in tile.characters:
                 char_x, char_y = self.character_coords(tile_screen_x, tile_screen_y, character.img_key)
                 if self.check_mask(screen_x, screen_y, char_x, char_y, character.img_key):
                     print(f"CHARACTER clicked on tile: {target_col}, {target_row}")
                     return "CHAR", character
-        if tile.building:
+        if check_entities and tile.building:
             build_screen_x, build_screen_y = self.building_coords(
                 tile_screen_x, tile_screen_y, 'apartment')
             if self.check_mask(screen_x, screen_y, build_screen_x, build_screen_y, 'apartment'):
                 print(f"BUILDING clicked on tile: {target_col}, {target_row}")
                 return "BUILD", tile.building
+        # Check tile
         if self.check_mask(screen_x, screen_y, tile_screen_x, tile_screen_y, tile.img_key):
             print(f"Tile: {target_col}, {target_row} clicked")
             return "TILE", tile

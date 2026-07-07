@@ -1,28 +1,34 @@
 from client_ui import Button
+import pygame_gui
+from client_character import Character, Bob, Joe, Xub
 
 class DummyShop:
-    def __init__(self, window, config):
-        self.characters = {
-            "test1": {"health": "10", "cost": 200},
-            "test2": {"health": "10", "cost": 200},
-            "test3": {"health": "10", "cost": 200}
+    def __init__(self):
+        self.categories = {
+            "tier_1_characters": {
+                "Character": {"item": Character, "count": 2},
+                "Bob": {"item": Bob, "count": 1},
+                "Joe": {"item": Joe, "count": 1}
+            },
+
+            "tier_2_characters": {
+                "Xub": {"item": Xub, "count": 1},
+                "Bob": {"item": Bob, "count": 1}
+            },
+            "tier_3_characters": {},
+            "tier_4_characters": {},
+            "regular_weapons": {},
+            "special_weapons": {}
         }
-        self.window = window
-        self.config = config
-        self.imgs = self.config.assets.imgs
-        self.frames = []
-        self.initialize_shop()
 
-    def initialize_shop(self):
-        rows = 3
-        cols = 4
-        frame_height = self.imgs["test_char_frame"].get_height()
-        frame_width = self.imgs["test_char_frame"].get_width()
-        start_x = (self.config.screen_width / 2) - (frame_width * (cols / 2))
-        start_y = (self.config.screen_height / 2) - (frame_width * (rows / 2))
 
-        for num in range(rows):
-            for num2 in range(cols):
-                frame_x = start_x + (num2 * frame_width)
-                frame_y = start_y + (num * frame_height)
-                self.frames.append(Button(frame_x, frame_y, self.purchase_character, self.imgs["test_char_frame"]))
+    def make_purchase(self, item, player):
+        if item["cost"] <= player.money:
+            player.money -= item["cost"]
+            purchased_item = None # ADD LATER
+            print("item \"purchased\"")
+            # ADD ITEM TO PLAYER INVENTORY (UNFINISHED)
+            return True
+        else:
+            print("Not enough money!")
+            return False

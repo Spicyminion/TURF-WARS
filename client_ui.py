@@ -28,9 +28,16 @@ class HUD:
             manager= self.game.ui_manager,
         )
 
+        self.view_shop_button = pygame_gui.elements.UIButton(
+            relative_rect = pygame.Rect((10, 90), (100, 50)),
+            text = 'SHOP',
+            manager= self.game.ui_manager,
+        )
+
         self.buttons = {
             self.change_turn_button: self.change_turn,
-            self.view_board_button: self.game.open_board
+            self.view_board_button: self.game.open_board,
+            self.view_shop_button: self.game.open_shop
         }
 
     def handle_button_pressed(self, event): # event is passed from the pygame_gui event manager

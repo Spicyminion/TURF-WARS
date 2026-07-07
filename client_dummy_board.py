@@ -22,7 +22,7 @@ class DummyBoard:
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
                     tile.building = Building( BuildType.APARTMENT, column, row, 1)  # for testing purposes
-        test_character = Character(10, 10, "smile", 3, 3, 1,1,1)
+        test_character = Character("smile", 3, 3, 1, 1)
         self.tiles[3][3].characters.append(test_character)
         self.characters = {test_character.character_id: test_character}
 

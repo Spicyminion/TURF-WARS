@@ -29,14 +29,6 @@ NUM_OF_PLAYERS = 2
 
 manager = pygame_gui.UIManager((config.screen_width, config.screen_height), theme_path="custom_buttons.json")
 
-"""
-hello_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350, 275), (100, 50)),
-                                            text='Say Hello',
-                                            manager=manager)
-"""
-
-#game = Game(SCREEN, config, NUM_OF_PLAYERS)
-
 #####################
 # Initialize Client #
 #####################
@@ -98,9 +90,6 @@ def main():
 
             manager.process_events(event)  # handle GUI clicks first
 
-            #if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            #    if event.ui_element == hello_button:
-            #        print("Hello!!!")
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 game.check_buttons_pressed(event)
 

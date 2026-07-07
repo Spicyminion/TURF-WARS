@@ -1,5 +1,6 @@
 import pygame
 from client_dummy_board import DummyBoard
+from client_dummy_shop import DummyShop
 import json
 import queue
 class Game:
@@ -10,7 +11,10 @@ class Game:
         self.players = []
         self.player_turn = 1
         self.message_list = message_list
+
         self.board = DummyBoard()
+        self.shop = DummyShop()
+
         self.new_msg = None
         self.table = {
             "CHANGE_TURN": self.change_turn,
@@ -57,6 +61,8 @@ class Game:
                 client.send(msg)
                 print(f"send move update to {client}")
 
+    def make_purchase(self):
+        pass
 
     def add_object(self):
         print("passing object to clients")

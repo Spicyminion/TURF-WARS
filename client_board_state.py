@@ -88,14 +88,17 @@ class CharacterSelectedState(BoardViewState):
 
     def move_character_state(self):
         print("MOVE BUTTON CLICKED!!!")
-        if self.player_turn == self.character_selected.player_id \
-        and self.character_selected.moved == False:
+        if (self.game.player_id == self.character_selected.player_id
+        and not self.character_selected.moved
+        and self.game.player_turn == self.game.player_id):
             print("switching to CharacterMoveState")
             self.game.change_state(CharacterMoveState(self.game, self.character_selected))
-        elif self.player_turn != self.character_selected.player_id:
+        elif self.game.player_turn != self.game.player_id:
             print("it is not your turn to move characters")
-        else:
+        elif self.character_selected.moved:
             print("this character has already used its move this turn")
+        else:
+            print("you do not own this character")
 
     def attack_character_state(self):
         self.game.change_state(CharacterMoveState(self.game, self.character_selected))
@@ -132,7 +135,7 @@ class CharacterMoveState(BoardViewState):
             button_clicked()
 
     def handle_click(self, x, y):
-        object_type, clicked_object = self.renderer.check_click(x, y, self.game.board)
+        object_type, clicked_object = self.renderer.check_click(x, y, self.game.board, check_entities=False)
         if object_type == "TILE":
             print("CHARACTER STATE IS MOVE AND A TILE WAS CLICKED")
             self.move_character(clicked_object)
@@ -152,7 +155,6 @@ class CharacterMoveState(BoardViewState):
 
         self.game.send_to_server(msg, message_id)
         self.game.change_state(BoardIdleState(self.game))  # return to idle state
-        #self.board.move_character(self.character_selected, new_tile)
 
     # Button commands
 
