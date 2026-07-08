@@ -20,9 +20,10 @@ class ShopRenderer:
         self.frame_height = None
         self.frame_width = None
 
-        self.item_buttons = {}
+        self.item_buttons = {}  # if any of these are triggered, send output back to ShopState
         self.shop_menu_buttons = {}
         self.shop_page_buttons = {}
+        self.other_buttons = [self.shop_menu_buttons, self.shop_page_buttons] # if any of these are triggered, renderer internally handles command
         self.shop_page = 1
         self.active_category = "tier_1_characters"
         self._init()
@@ -49,7 +50,7 @@ class ShopRenderer:
                 text=f'{category_list[index]}',
                 manager=self.ui_manager,
             )
-            self.shop_menu_buttons[button] = category_list[index] # we will then call in the main dictionary
+            self.shop_menu_buttons[button] = lambda cat=category_list[index]: self.change_category(cat) # we will then call in the main dictionary
         self.generate_items()
 
     def change_category(self, category_name):
@@ -63,19 +64,21 @@ class ShopRenderer:
 
     def handle_button_pressed(self, event):
         # CHECK IF WE'RE CHANGING ITEMS DISPLAYED
-        button_clicked = self.shop_menu_buttons.get(event.ui_element)
+        for button_group in self.other_buttons:
+            button_clicked = button_group.get(event.ui_element)
+            if button_clicked:
+                break
         if button_clicked:
-            print("CATEGORY CLICKED")
-            self.change_category(button_clicked)
+            button_clicked()  # Need to implement this with lambda
             return None
+
         # CHECK IF WE'RE SELECTING AN ITEM TO PURCHASE
-        else:
-            item_clicked = self.item_buttons.get(event.ui_element)
-            if item_clicked:
-                print(f"Attempting to purchase: {item_clicked}")
-                print(f"item: info: {self.shop.categories[self.active_category][item_clicked]}")
-                return item_clicked
-            return None
+        item_clicked = self.item_buttons.get(event.ui_element)
+        if item_clicked:
+            print(f"Attempting to purchase: {item_clicked}")
+            print(f"item: info: {self.shop.categories[self.active_category][item_clicked]}")
+            return item_clicked
+        return None
 
     def generate_items(self):
         print("GENERATE ITEMS")
@@ -114,7 +117,6 @@ class ShopRenderer:
                 text=item_list[index],
                 manager=self.ui_manager,
             )
-            print("button generated for shop")
             self.item_buttons[button] = item_list[index]
             index += 1
         pass
