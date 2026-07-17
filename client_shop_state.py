@@ -1,4 +1,5 @@
 from base_state import GameState
+import json
 
 class ShopState(GameState):
     def __init__(self, game):
@@ -27,6 +28,11 @@ class ShopState(GameState):
     def make_purchase(self, item_clicked):
         print("PURCHASING TEST (CLIENT -> SERVER)")
         message_id = f"{self.game.player_id}_{self.game.message_counter}"
+        msg = {"action": "PURCHASE",
+                        "item": item_clicked,
+                        "category": "TBD",
+                        "message_id": message_id}
+        #self.game.client.send_to_server(msg)
 
     def handle_continuous_inputs(self, keys):
         pass

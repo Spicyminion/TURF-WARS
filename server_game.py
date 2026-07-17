@@ -18,7 +18,7 @@ class Game:
         self.new_msg = None
         self.table = {
             "CHANGE_TURN": self.change_turn,
-            "add_object": self.add_object,
+            "add_object": self.add_object, # REMOVE EVENTUALLY
             "MOVE": self.move_character,
         }
         self.game_state = None
@@ -60,6 +60,15 @@ class Game:
             for client in self.clients:
                 client.send(msg)
                 print(f"send move update to {client}")
+        else:
+            self.reject_request()
+
+    def reject_request(self):
+        action_type = self.new_msg.get("action")
+        player_id = int(self.new_msg.get("player_id"))
+        msg_id = self.new_msg.get("message_id")
+        msg = {"action": "REJECT", "request": f"{action_type}", "message_id": msg_id}
+        self.clients[player_id - 1].send(json.dumps(msg).encode())
 
     def make_purchase(self):
         pass

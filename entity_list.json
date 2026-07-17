@@ -1,0 +1,69 @@
+
+
+{
+    "characters": {
+      "tier_1": {
+        "Bruiser_Bob": {
+          "name": "Bruiser Bob",
+          "class_type": "CHARACTER",
+          "hp": 20,
+          "dmg": 5,
+          "movement_range": 1,
+          "abilities": []
+        },
+        "Joe": {
+          "name": "Joe",
+          "class_type": "CHARACTER",
+          "hp": 15,
+          "dmg": 10,
+          "movement_range": 1,
+          "abilities": []
+        }
+      },
+      "tier_2": {
+        "Xub": {
+          "name": "Xub",
+          "class_type": "CHARACTER",
+          "hp": 30,
+          "dmg": 5,
+          "movement_range": 1,
+          "abilities": []
+        },
+        "Crafty_Carl": {
+          "name": "Crafty_Carl",
+          "class_type": "CHARACTER",
+          "hp": 10,
+          "dmg": 10,
+          "movement_range": 1,
+          "abilities": []
+        }
+      },
+      "tier_3": {
+
+      },
+      "tier_4": {
+
+      }
+    },
+    "vehicles": {
+      "normal_vehicles": {
+
+      }
+    },
+    "equipment": {
+      "normal_equipment": {
+
+      },
+      "special_equipment": {
+
+      }
+    },
+    "buildings": {
+      "operations_buildings": {
+
+      },
+      "buildable": {
+
+      }
+    }
+}

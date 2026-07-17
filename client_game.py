@@ -2,7 +2,7 @@ import pygame
 import json
 
 from client_board_renderer import BoardRenderer
-from client_board_state import CharacterSelectedState, CharacterMoveState, CharacterAttackState
+from client_board_state import CharacterSelectedState
 from client_shop_renderer import ShopRenderer
 from client_shop_state import ShopState
 from client_ui import HUD
@@ -30,14 +30,16 @@ class Game:
 
         self.player_turn = 1
         self.player = None
-        self.ui_manager = ui_manager
+        self.ui_manager = ui_manager # maintain buttons always active
 
         self.hud = HUD(self)
         self.shop = DummyShop()
         self.board = DummyBoard()
+
         self.camera = PlayerCamera(self.config)
         self.board_renderer = BoardRenderer(self)
         self.shop_renderer = ShopRenderer(self)
+
         self.game_state = BoardIdleState(self)
         self.board_open = True
         self._init()
@@ -49,7 +51,9 @@ class Game:
             "player_id": self.assign_id,
             "CHANGE_TURN": self.change_turn,
             "add_object": self.add_object,
-            "MOVE": self.move_character_from_server
+            "MOVE": self.move_character_from_server,
+            "REJECT": self.rejected_from_server,
+            "PURCHASE": self.purchase_character_from_server
         }
 
     #################
@@ -63,18 +67,13 @@ class Game:
         print(f"state changed to {new_state}")
 
     def open_shop(self):
-        self.game_state = ShopState(self)
-        print(f"state changed to shop")
+        self.change_state(ShopState(self))
 
     def open_board(self):
-        if hasattr(self.game_state, 'cleanup'):
-            self.game_state.cleanup()
-        self.game_state = BoardIdleState(self)
-        print(f"state changed to board")
+        self.change_state(BoardIdleState(self))
 
     def open_character(self, character):
-        self.game_state = CharacterSelectedState(self, character)
-        print(f"state changed to character selected")
+        self.change_state(CharacterSelectedState(self, character))
 
     def draw_screen(self):
         self.game_state.draw()
@@ -138,22 +137,16 @@ class Game:
         character_id = self.new_msg.get("character_id")
         self.board.move_character(character_id, col, row)
 
+    def rejected_from_server(self):
+        request = self.new_msg.get("request")
+        print(f"rejected from server: {request}")
+
     def purchase_character_from_server(self):
         purchase_character = self.new_msg.get("purchase_character")
-
-
-    def request_add_object(self):
-        msg = json.dumps({"action": "add_object",
-                          "col": "3", "row": "3", "object_type": "CHARACTER",
-                          "id": f"{self.player_id}"}).encode()
-        self.client.client.send(msg)
+        self.board.add_character(purchase_character, self.player.id) # fix
 
     def add_object(self):
-        row = self.new_msg.get("row")
-        col = self.new_msg.get("col")
-        object_type = self.new_msg.get("object_type")
-        player_id = self.new_msg.get("id")
-        self.board.add_object(col, row, object_type, player_id)
+        self.board.add_object(self.new_msg, self.shop)
 
     def send_to_server(self, data_dict, message_id):
         try:
@@ -180,8 +173,3 @@ class Game:
 
     def update(self):
         self.process_queue()
-
-
-
-
-

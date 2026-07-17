@@ -12,6 +12,11 @@ class DummyBoard:
         self.characters = {}
         self.define_grid()
         self.player_turn = 1
+        self.object_map = {
+            "CHARACTER":    self.add_character,
+            "BUILDING":     self.add_building,
+            "ITEM":         self.add_item
+        }
 
     def define_grid(self):
         for column in range(len(layout)):
@@ -22,14 +27,30 @@ class DummyBoard:
                 if column == 1 and row == 1:
                     tile = self.tiles[column][row]
                     tile.building = Building( BuildType.APARTMENT, column, row, 1)  # for testing purposes
-        test_character = Character("smile", 3, 3, 1, 1)
+        test_character = Character("smile", 3, 3, 1, 1, None, None)
         self.tiles[3][3].characters.append(test_character)
         self.characters = {test_character.character_id: test_character}
 
-    def add_object(self, col, row, object_type):
+    def add_object(self, msg, shop):
+        object_type = msg.get("type")
+        add_function = self.object_map.get(object_type)
+
+        if add_function:
+            add_function(msg) # ignore warning
+        else:
+            print(f"Object type {object_type} not recognized")
+
+    def add_character(self, data):
+        col, row = data["column"], data["row"]
+        character = data["character"]
+        tile = self.tiles[int(col)][int(row)]
+        tile.characters.append(data)
+
+    def add_building(self, data):
         pass
-        # Add code later
-        #tile = self.tiles[int(col)][int(row)]
+
+    def add_item(self, data):
+        pass
 
     def move_character(self, character_id, new_col, new_row):
         character = self.characters[character_id]
@@ -48,6 +69,3 @@ class DummyBoard:
 
     def attack_character(self, character, damage):
         pass
-
-
-

@@ -5,14 +5,17 @@ from pygame.examples.scroll import zoom_factor
 
 from layout import layout, TileType
 from constants import DIMENSION, HALF_HEIGHT
-
-
 class Player:
 
     def __init__(self, player_id):
         self.id = player_id
-        self.money = 200
+        self.money = 500
+        self.revenue_streams = []
 
+    def end_of_turn_revenue(self):
+        for revenue in self.revenue_streams:
+            income = revenue.generate_revenue() # pseudo method (ADD LATER)
+            self.money += income
 
 class PlayerCamera:
     def __init__(self, config):

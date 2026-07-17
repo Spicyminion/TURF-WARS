@@ -88,9 +88,10 @@ class CharacterSelectedState(BoardViewState):
 
     def move_character_state(self):
         print("MOVE BUTTON CLICKED!!!")
-        if (self.game.player_id == self.character_selected.player_id
+        print(f"player ID: {self.game.player_id} player turn: {self.game.player_turn} character moved {self.character_selected.moved}")
+        if (int(self.game.player_id) == int(self.character_selected.player_id)
         and not self.character_selected.moved
-        and self.game.player_turn == self.game.player_id):
+        and int(self.game.player_turn) == int(self.game.player_id)):
             print("switching to CharacterMoveState")
             self.game.change_state(CharacterMoveState(self.game, self.character_selected))
         elif self.game.player_turn != self.game.player_id:
@@ -146,11 +147,12 @@ class CharacterMoveState(BoardViewState):
         col = int(new_tile.col)
         row = int(new_tile.row)
         char_id = int(self.character_selected.character_id)
-        print(f"ID: {message_id} COL: {col} ROW:{row}, char_id: {char_id}")
+        print(f"ID: {message_id} COL: {col} ROW:{row} char_id: {char_id}")
         msg = {"action": "MOVE",
                           "new_col": col,
                           "new_row": row,
                           "character_id": char_id,
+                          "player_id": self.game.player_id,
                           "message_id": message_id}
 
         self.game.send_to_server(msg, message_id)

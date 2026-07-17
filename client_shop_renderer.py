@@ -1,7 +1,7 @@
 import pygame
 import pygame_gui
 import math
-
+import json
 
 class ShopRenderer:
     def __init__(self, game):
@@ -24,8 +24,10 @@ class ShopRenderer:
         self.shop_menu_buttons = {}
         self.shop_page_buttons = {}
         self.other_buttons = [self.shop_menu_buttons, self.shop_page_buttons] # if any of these are triggered, renderer internally handles command
+        self.main_categories = game.shop.main_categories
         self.shop_page = 1
-        self.active_category = "tier_1_characters"
+        self.active_category = None
+        self.current_depth = 0
         self._init()
 
     def _init(self):
@@ -36,10 +38,15 @@ class ShopRenderer:
         self.start_x = (self.config.screen_width / 2) - (self.frame_width * (self.cols / 2))
         self.start_y = (self.config.screen_height / 2) - (self.frame_height * (self.rows / 2))
 
+
+    def load_shop(self):
+        print("hi")
+        pass
+
     def open_shop_page(self):
-        category_list = list(self.shop.categories.keys())  # ex. tier_1_chars, special_weapons, etc.
+        category_list = list(self.shop.entities.keys()) # ex. tier_1_chars, special_weapons, etc.
         num_categories = len(category_list)
-        size = 100  # need to make this dynamically adjustable in future
+        size = 100 # need to make this dynamically adjustable in future
         starting_x = (self.config.screen_width / 2) - (num_categories / 2 * size)
         starting_y = self.config.screen_height - size # start almost at bottom
         for index in range(num_categories):
@@ -51,9 +58,14 @@ class ShopRenderer:
                 manager=self.ui_manager,
             )
             self.shop_menu_buttons[button] = lambda cat=category_list[index]: self.change_category(cat) # we will then call in the main dictionary
-        self.generate_items()
+        #self.generate_items()
+
+    def go_back(self):
+        pass
+        # go back to main screen
 
     def change_category(self, category_name):
+        # need to add if/else statement depending if we already have an active category
         self.active_category = category_name
         self.shop_page = 1
         self.generate_items()
