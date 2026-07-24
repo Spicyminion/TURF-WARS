@@ -9,7 +9,7 @@ class ShopState(GameState):
         self._init()
 
     def _init(self):
-        self.renderer.open_shop_page()
+        self.renderer.load_shop()
 
     def handle_click(self, x, y):
         pass

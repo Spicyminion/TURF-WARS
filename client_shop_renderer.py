@@ -21,9 +21,11 @@ class ShopRenderer:
         self.frame_width = None
 
         self.item_buttons = {}  # if any of these are triggered, send output back to ShopState
+        self.shop_static_buttons = {}
         self.shop_menu_buttons = {}
         self.shop_page_buttons = {}
-        self.other_buttons = [self.shop_menu_buttons, self.shop_page_buttons] # if any of these are triggered, renderer internally handles command
+        self.file_path = []
+        self.other_buttons = [self.shop_menu_buttons, self.shop_page_buttons, self.shop_static_buttons] # if any of these are triggered, renderer internally handles command
         self.main_categories = game.shop.main_categories
         self.shop_page = 1
         self.active_category = None
@@ -38,11 +40,41 @@ class ShopRenderer:
         self.start_x = (self.config.screen_width / 2) - (self.frame_width * (self.cols / 2))
         self.start_y = (self.config.screen_height / 2) - (self.frame_height * (self.rows / 2))
 
+    def generate_path(self):
+        reference = self.shop.entities["home"]
+        for level in self.file_path:
+            reference = reference["children"][level]
+        return reference
 
     def load_shop(self):
-        print("hi")
-        pass
+        reference = self.generate_path()
+        category_list = list(reference["children"].keys())
+        print(f" CHILDREN CATEGORIES {category_list}")
+        num_categories = len(category_list)
+        size = 100 # need to make this dynamically adjustable in future
+        starting_x = (self.config.screen_width / 2) - (num_categories / 2 * size)
+        starting_y = self.config.screen_height - size # start almost at bottom
+        for index in range(num_categories):
+            button_x = starting_x + (size * index)
+            button_y = starting_y
+            button = pygame_gui.elements.UIButton(
+                relative_rect=pygame.Rect((button_x, button_y), (size, size)), # need to change this be dynamic
+                text=f'{category_list[index]}',
+                manager=self.ui_manager,
+            )
+            self.shop_menu_buttons[button] = lambda cat=category_list[index]: self.change_level(cat) # we will then call in the main dictionary
 
+        # Now add go back button
+        button_x = self.config.screen_width - size
+        button_y = self.config.screen_height / 2
+        button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((button_x, button_y), (size, size)),  # need to change this be dynamic
+            text='BACK',
+            manager=self.ui_manager,
+        )
+        self.shop_static_buttons[button] = lambda: self.go_back()
+
+    # METHOD BELOW WILL BE DEFUNCT
     def open_shop_page(self):
         category_list = list(self.shop.entities.keys()) # ex. tier_1_chars, special_weapons, etc.
         num_categories = len(category_list)
@@ -57,49 +89,46 @@ class ShopRenderer:
                 text=f'{category_list[index]}',
                 manager=self.ui_manager,
             )
-            self.shop_menu_buttons[button] = lambda cat=category_list[index]: self.change_category(cat) # we will then call in the main dictionary
-        #self.generate_items()
+            self.shop_menu_buttons[button] = lambda cat=category_list[index]: self.change_level(cat) # we will then call in the main dictionary
 
     def go_back(self):
-        pass
-        # go back to main screen
+        self.file_path.pop() # remove last index
+        self.active_category = self.generate_path()
+        self.change_level(self.active_category)
 
-    def change_category(self, category_name):
-        # need to add if/else statement depending if we already have an active category
-        self.active_category = category_name
+    def change_level(self, category_name):
+        self.clear_buttons()
+        self.file_path.append(category_name)
+        self.active_category = self.generate_path()
         self.shop_page = 1
-        self.generate_items()
 
-    def change_page(self, page):
-        self.shop_page = page
-        self.generate_items()
+        if self.active_category["type"] == "FOLDER":
+            self.generate_sub_folders()
+        elif self.active_category["type"] == "ITEMS":
+            self.generate_items()
 
-    def handle_button_pressed(self, event):
-        # CHECK IF WE'RE CHANGING ITEMS DISPLAYED
-        for button_group in self.other_buttons:
-            button_clicked = button_group.get(event.ui_element)
-            if button_clicked:
-                break
-        if button_clicked:
-            button_clicked()  # Need to implement this with lambda
-            return None
-
-        # CHECK IF WE'RE SELECTING AN ITEM TO PURCHASE
-        item_clicked = self.item_buttons.get(event.ui_element)
-        if item_clicked:
-            print(f"Attempting to purchase: {item_clicked}")
-            print(f"item: info: {self.shop.categories[self.active_category][item_clicked]}")
-            return item_clicked
-        return None
+    def generate_sub_folders(self):
+        category_list = list(self.active_category["children"].keys())
+        num_folders = len(category_list)
+        num_categories = len(category_list)
+        size = 100  # need to make this dynamically adjustable in future
+        starting_x = (self.config.screen_width / 2) - (num_categories / 2 * size)
+        starting_y = self.config.screen_height - size  # start almost at bottom
+        for index in range(num_categories):
+            button_x = starting_x + (size * index)
+            button_y = starting_y
+            button = pygame_gui.elements.UIButton(
+                relative_rect=pygame.Rect((button_x, button_y), (size, size)),  # need to change this be dynamic
+                text=f'{category_list[index]}',
+                manager=self.ui_manager,
+            )
+            self.shop_menu_buttons[button] = lambda cat=category_list[index]: self.change_level(
+                cat)  # we will then call in the main dictionary
 
     def generate_items(self):
         print("GENERATE ITEMS")
-        # CLEAR OLD ITEM BUTTONS
-        for button in self.item_buttons:
-            button.kill()
-
         # GENERATE BUTTONS FOR NUMBER OF POSSIBLE PAGES (MAKE DYNAMICALLY ADJUSTABLE...)
-        item_list = list(self.shop.categories[self.active_category].keys())
+        item_list = list(self.active_category["items"].keys())
         print(f"NUMBER OF ITEMS SELECTED: {len(item_list)}")
         size = 100
         starting_y = self.config.screen_width - size
@@ -132,6 +161,33 @@ class ShopRenderer:
             self.item_buttons[button] = item_list[index]
             index += 1
         pass
+
+    def change_page(self, page):
+        self.shop_page = page
+        self.generate_items()
+
+    def clear_buttons(self):
+        for button in self.shop_page_buttons and self.item_buttons:
+            button.kill()
+
+    def handle_button_pressed(self, event):
+        # CHECK IF WE'RE CHANGING ITEMS DISPLAYED
+        button_clicked = None
+        for button_group in self.other_buttons:
+            button_clicked = button_group.get(event.ui_element)
+            if button_clicked:
+                break
+        if button_clicked:
+            button_clicked()  # Need to implement this with lambda
+            return None
+
+        # CHECK IF WE'RE SELECTING AN ITEM TO PURCHASE
+        item_clicked = self.item_buttons.get(event.ui_element)
+        if item_clicked:
+            print(f"Attempting to purchase: {item_clicked}")
+            print(f"item: info: {self.shop.categories[self.active_category][item_clicked]}")
+            return item_clicked
+        return None
 
     def make_purchase(self, item, player):
         if self.shop.make_purchase(item, player):
